@@ -81,9 +81,9 @@ function runPsql(url: string, args: string[]): string {
   });
 }
 
-export async function withThrowawayDb<T>(
-  fn: (db: ThrowawayDb) => Promise<T>,
-): Promise<T> {
+export type ThrowawayHandle = { db: ThrowawayDb; stop: () => Promise<void> };
+
+export async function startThrowawayDb(): Promise<ThrowawayHandle> {
   const dataDir = mkdtempSync(path.join(os.tmpdir(), "spectacle-pg-"));
   const logFile = path.join(dataDir, "pg.log");
   let started = false;
@@ -134,8 +134,18 @@ export async function withThrowawayDb<T>(
     };
 
     await applyMigrations(db.ownerUrl);
-    return await fn(db);
-  } finally {
+    return {
+      db,
+      stop: async () => {
+        try {
+          execServerBin("pg_ctl", ["-D", dataDir, "-m", "immediate", "stop"]);
+        } catch {
+          /* already down */
+        }
+        rmSync(dataDir, { recursive: true, force: true });
+      },
+    };
+  } catch (err) {
     if (started) {
       try {
         execServerBin("pg_ctl", ["-D", dataDir, "-m", "immediate", "stop"]);
@@ -144,5 +154,17 @@ export async function withThrowawayDb<T>(
       }
     }
     rmSync(dataDir, { recursive: true, force: true });
+    throw err;
+  }
+}
+
+export async function withThrowawayDb<T>(
+  fn: (db: ThrowawayDb) => Promise<T>,
+): Promise<T> {
+  const handle = await startThrowawayDb();
+  try {
+    return await fn(handle.db);
+  } finally {
+    await handle.stop();
   }
 }
