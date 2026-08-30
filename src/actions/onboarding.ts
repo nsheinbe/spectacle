@@ -24,15 +24,16 @@ export async function selectRoleAction(
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
+  let effectiveRole: string;
   try {
-    await selectRole(session.userId, parsed.data.role, {
+    // selectRole self-heals duplicate-profile retries (a prior attempt that
+    // crashed between its two writes) and returns the authoritative role.
+    effectiveRole = await selectRole(session.userId, parsed.data.role, {
       fullName: parsed.data.fullName,
       company: parsed.data.company,
     });
-  } catch (err) {
-    const code = (err as { cause?: { code?: string } })?.cause?.code;
-    if (code === "23505") redirect("/dashboard"); // profile already exists
+  } catch {
     return { error: "Could not save your role — try again." };
   }
-  redirect(parsed.data.role === "creator" ? "/settings" : "/dashboard");
+  redirect(effectiveRole === "creator" ? "/settings" : "/dashboard");
 }

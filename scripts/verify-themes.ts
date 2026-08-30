@@ -69,6 +69,22 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
+/**
+ * All source scans below run on comment-STRIPPED code: the markers being
+ * checked (requestAnimationFrame, IntersectionObserver, prefers-reduced-
+ * motion) legitimately appear in comments, and a scan that matched comments
+ * would stay green after the actual behavior was deleted.
+ */
+function stripComments(source: string): string {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/(^|[^:])\/\/[^\n]*/g, "$1");
+}
+
+function readCode(p: string): string {
+  return stripComments(readFileSync(p, "utf8"));
+}
+
 /* ── per-theme checks ── */
 
 console.log("verify-themes\n");
@@ -99,7 +115,7 @@ for (const def of Object.values(themeRegistry)) {
       signatureFiles.add(path.normalize(p));
       if (!existsSync(p)) fail(`signature file missing: ${def.signatureFile}`);
       else {
-        const text = readFileSync(p, "utf8");
+        const text = readCode(p);
         if (!text.includes("requestAnimationFrame")) fail("declared rAF loop not found");
         else ok("single rAF loop present");
         if (!text.includes("IntersectionObserver")) fail("rAF loop not IntersectionObserver-paused");
@@ -120,7 +136,7 @@ for (const def of Object.values(themeRegistry)) {
 
 for (const file of [...walk(path.join(ROOT, "src/themes")), ...walk(path.join(ROOT, "src/components"))]) {
   if (signatureFiles.has(path.normalize(file))) continue;
-  if (readFileSync(file, "utf8").includes("requestAnimationFrame")) {
+  if (readCode(file).includes("requestAnimationFrame")) {
     fail(`undeclared rAF loop in ${path.relative(ROOT, file)}`);
   }
 }
@@ -130,7 +146,7 @@ ok("no undeclared rAF loops outside registered signature files");
 
 const railDir = path.join(ROOT, "src/components/rail");
 for (const file of walk(railDir)) {
-  const text = readFileSync(file, "utf8");
+  const text = readCode(file);
   if (/from\s+["'][^"']*themes/.test(text)) {
     fail(`${path.relative(ROOT, file)} imports src/themes/** — rail must never theme`);
   }

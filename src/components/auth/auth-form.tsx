@@ -7,8 +7,18 @@ import { Button } from "@/components/ui/button";
 import { FieldError, Input, Label } from "@/components/ui/field";
 import { authClient } from "@/lib/auth/auth-client";
 
-export function AuthForm({ googleEnabled }: { googleEnabled: boolean }) {
+export function AuthForm({
+  googleEnabled,
+  next,
+}: {
+  googleEnabled: boolean;
+  /** pre-validated same-origin path from ?next (middleware bounce target) */
+  next: string | null;
+}) {
   const router = useRouter();
+  // /onboarding forwards onboarded users to /dashboard; users mid-booking
+  // land back where the middleware bounced them from.
+  const destination = next ?? "/onboarding";
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -30,7 +40,7 @@ export function AuthForm({ googleEnabled }: { googleEnabled: boolean }) {
       setError(result.error.message ?? "Something went wrong");
       return;
     }
-    router.push("/onboarding");
+    router.push(mode === "signup" ? "/onboarding" : destination);
     router.refresh();
   }
 
@@ -82,7 +92,7 @@ export function AuthForm({ googleEnabled }: { googleEnabled: boolean }) {
         <Button
           variant="secondary"
           className="mt-3 w-full"
-          onClick={() => authClient.signIn.social({ provider: "google", callbackURL: "/onboarding" })}
+          onClick={() => authClient.signIn.social({ provider: "google", callbackURL: destination })}
         >
           Continue with Google
         </Button>

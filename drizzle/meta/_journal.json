@@ -29,6 +29,20 @@
       "when": 1788097467802,
       "tag": "0003_functions",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788099703744,
+      "tag": "0004_fk_restrict",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788099704612,
+      "tag": "0005_hardening",
+      "breakpoints": true
     }
   ]
 }

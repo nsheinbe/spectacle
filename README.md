@@ -20,8 +20,8 @@ long-lived dev DB if you prefer).
 pnpm install
 
 # All security gates against a throwaway PG16 (real migrations, real roles):
-pnpm verify:gates            # 51-assertion allow/deny matrix
-pnpm verify:gates:canary     # + 13 fail-open mutations, each proven detected
+pnpm verify:gates            # 53-assertion allow/deny matrix
+pnpm verify:gates:canary     # + 15 fail-open mutations, each proven detected
 pnpm verify:themes           # WCAG AA + motion + stage/rail structure
 pnpm test                    # exhaustive status-machine grid (203 tests)
 
@@ -85,12 +85,12 @@ superuser can never mask the gap.
 
 Boots a throwaway PG16 (`initdb` + `pg_ctl`), runs `bootstrap-roles.sql` + the real
 journaled migrations + fixtures, then **connects as `app_user`** (self-asserting it
-is not owner/superuser/BYPASSRLS) and drives 51 named assertions across anon,
+is not owner/superuser/BYPASSRLS) and drives 53 named assertions across anon,
 brand A/B, creator A/B — reads, writes, transitions, presigning, static scans.
 
-`--canary` then applies 13 crafted fail-open mutations — one per named assertion —
+`--canary` then applies 15 crafted fail-open mutations — one per named assertion —
 e.g. a policy that loses its tenant scope, `GRANT UPDATE (status)`, `app_uid()`
-without `NULLIF`, an unpinned `search_path`, a laundered private import. For each
+without `NULLIF`, an unpinned `search_path`, a laundered private import (dynamic `import()` included), a re-opened storefront-delete cascade, a session-scoped `set_config`. For each
 row the suite proves: the named assertion flips **RED**, every other assertion
 stays green (declared collateral only: permissive SELECT policies OR together, so
 widening either bookings arm trips both non-participant read probes), and after
@@ -167,7 +167,19 @@ URLs at the branch; roles are cluster-level on the branch already.
   function must re-derive money without trusting the app; `PLATFORM_FEE_BPS` env
   only feeds UI estimates.
 - **`bookings.updated_at`** exists for the SD-function stamp (not in the original
-  column spec — logged).
+  column spec — logged) and is bumped by a `BEFORE UPDATE` trigger so the
+  app_user title/brief edit (whose column allowlist deliberately excludes
+  `updated_at`) still refreshes list ordering.
+- **Storefront deletion is closed in Phase 1** (post-audit): FK referential
+  actions run as table owner and bypass RLS, so a permitted DELETE on
+  `creator_profiles` used to cascade-wipe counterparty bookings, messages and
+  the append-only audit trail. Now `bookings.brand_id`, `bookings.creator_id`
+  and `reviews.creator_id` are `ON DELETE RESTRICT`, the DELETE grant and
+  policy are revoked, and unpublish is the supported off-switch.
+- **Role selection self-heals** (post-audit): its two writes hit two pools
+  non-atomically; the duplicate-profile retry path re-reads the authoritative
+  `profiles.role` and re-stamps the session copy, so a crash between the
+  writes can never brick an account in an onboarding loop.
 - **Fonts are vendored woff2** via `next/font/local` (OFL permits self-hosting);
   builds need no font CDN.
 - Residual, logged honestly: `price_cents`/`fee_cents` are insertable by a crafted

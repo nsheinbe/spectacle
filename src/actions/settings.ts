@@ -156,7 +156,12 @@ export async function upsertPackageAction(
     priceCents: Math.round(Number(formData.get("priceDollars") ?? 0) * 100),
     turnaroundDays: Number(formData.get("turnaroundDays") ?? 14),
     deliverableSummary: formData.get("deliverableSummary") ?? "",
-    active: formData.get("active") !== "false",
+    // hidden "false" + checkbox "true": an unchecked box still submits the
+    // field, so unchecking really deactivates. Forms without the field
+    // (the add form) default to active.
+    active: formData.has("active")
+      ? formData.getAll("active").includes("true")
+      : true,
   });
   if (!parsed.success) return { error: firstIssue(parsed.error) };
   const identity = toIdentity(session);
@@ -196,7 +201,9 @@ export async function upsertUsageRightsAction(
     name: formData.get("name"),
     description: formData.get("description") ?? "",
     priceDeltaCents: Math.round(Number(formData.get("priceDeltaDollars") ?? 0) * 100),
-    active: formData.get("active") !== "false",
+    active: formData.has("active")
+      ? formData.getAll("active").includes("true")
+      : true,
   });
   if (!parsed.success) return { error: firstIssue(parsed.error) };
   const identity = toIdentity(session);

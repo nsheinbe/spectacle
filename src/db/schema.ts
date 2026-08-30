@@ -281,10 +281,10 @@ export const bookings = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     brandId: uuid("brand_id")
       .notNull()
-      .references(() => profiles.id, { onDelete: "cascade" }),
+      .references(() => profiles.id, { onDelete: "restrict" }),
     creatorId: uuid("creator_id")
       .notNull()
-      .references(() => creatorProfiles.id, { onDelete: "cascade" }),
+      .references(() => creatorProfiles.id, { onDelete: "restrict" }),
     packageId: uuid("package_id")
       .notNull()
       .references(() => packages.id, { onDelete: "restrict" }),
@@ -400,7 +400,7 @@ export const reviews = pgTable(
       .references(() => profiles.id),
     creatorId: uuid("creator_id")
       .notNull()
-      .references(() => creatorProfiles.id, { onDelete: "cascade" }),
+      .references(() => creatorProfiles.id, { onDelete: "restrict" }),
     rating: integer("rating").notNull(),
     body: text("body").notNull().default(""),
     createdAt: timestamp("created_at", { withTimezone: true })

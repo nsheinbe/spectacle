@@ -7,9 +7,16 @@ import { env } from "@/lib/env";
 export const metadata = { title: "Sign in" };
 export const dynamic = "force-dynamic";
 
-export default async function AuthPage() {
+export default async function AuthPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
+  // same-origin paths only — never redirect to another host
+  const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : null;
   const session = await getServerSession();
-  if (session) redirect(session.role ? "/dashboard" : "/onboarding");
+  if (session) redirect(session.role ? (safeNext ?? "/dashboard") : "/onboarding");
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-4 py-12">
       <h1 className="font-display text-3xl text-text">Spectacle</h1>
@@ -17,7 +24,7 @@ export default async function AuthPage() {
         Book the unmissable — projection, FOOH, anamorphic, drones, street art.
       </p>
       <div className="mt-8">
-        <AuthForm googleEnabled={Boolean(env.GOOGLE_CLIENT_ID)} />
+        <AuthForm googleEnabled={Boolean(env.GOOGLE_CLIENT_ID)} next={safeNext} />
       </div>
     </main>
   );

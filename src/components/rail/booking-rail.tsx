@@ -21,6 +21,9 @@ export function BookingRail({
   const cheapest = packages.length
     ? packages.reduce((a, b) => (a.priceCents <= b.priceCents ? a : b))
     : null;
+  // /book/[packageId] requires at least one active usage-rights option — a
+  // "Start booking" link that lands on a 404 is worse than saying so here.
+  const bookable = rights.length > 0;
   return (
     <aside
       aria-label="Book this creator"
@@ -46,12 +49,18 @@ export function BookingRail({
               <p className="mt-1 text-xs text-text-faint">
                 ~{pkg.turnaroundDays} day turnaround
               </p>
-              <Link
-                href={`/book/${pkg.id}`}
-                className="mt-3 inline-flex h-9 w-full items-center justify-center rounded bg-beam px-4 text-sm font-medium text-canvas hover:brightness-110"
-              >
-                Start booking
-              </Link>
+              {bookable ? (
+                <Link
+                  href={`/book/${pkg.id}`}
+                  className="mt-3 inline-flex h-9 w-full items-center justify-center rounded bg-beam px-4 text-sm font-medium text-canvas hover:brightness-110"
+                >
+                  Start booking
+                </Link>
+              ) : (
+                <p className="mt-3 rounded border border-line px-3 py-2 text-center text-xs text-text-faint">
+                  Not bookable yet — usage rights are being set up
+                </p>
+              )}
             </li>
           ))}
           {packages.length === 0 && (

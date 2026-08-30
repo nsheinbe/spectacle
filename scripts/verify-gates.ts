@@ -173,7 +173,11 @@ export function importBanViolations(): string[] {
     if (rel.startsWith("src/db/")) continue;
     const text = readFileSync(file, "utf8");
     const inAuthLib = rel.startsWith("src/lib/auth/");
-    const importRe = /from\s+["'][^"']*db\/(rls|client\.internal|auth-db)(\.js)?["']/g;
+    // static import/export-from, dynamic import(), and require() alike, with
+    // or without a .ts/.tsx/.js extension — a laundering route through any of
+    // them is the same hole.
+    const importRe =
+      /(?:from\s+|import\s*\(\s*|require\s*\(\s*)["'][^"']*db\/(rls|client\.internal|auth-db)(\.[cm]?[tj]sx?)?["']/g;
     let m: RegExpExecArray | null;
     while ((m = importRe.exec(text))) {
       if (m[1] === "auth-db" && inAuthLib) continue;
@@ -184,6 +188,21 @@ export function importBanViolations(): string[] {
     }
   }
   return violations;
+}
+
+/**
+ * withUser MUST set the identity GUCs transaction-locally (is_local => true):
+ * session-scoped set_config would leak identity to whichever request reuses
+ * the pooled connection next. The pooled-reuse probe re-implements its own
+ * set_config, so it cannot see a regression in rls.ts itself — this scan
+ * pins the actual source (canary row 15 proves the scan bites).
+ */
+function withUserGucScanViolations(): string[] {
+  const text = readFileSync(path.join(SRC, "db", "rls.ts"), "utf8");
+  const calls = text.match(/set_config\([^)]*\)/g) ?? [];
+  const bad = calls.filter((c) => !/,\s*true\s*\)$/.test(c));
+  if (calls.length < 2) bad.push("expected two set_config calls in withUser");
+  return bad;
 }
 
 function storageEnvViolations(): string[] {
@@ -418,6 +437,18 @@ const assertions: Assertion[] = [
         ]);
         if (r.state) fail(`errored: ${r.state}`);
         if (r.rowCount !== 1) fail(`rowCount ${r.rowCount} — UPDATE policy missing?`);
+        // updated_at is trigger-stamped (the column is deliberately outside
+        // the UPDATE grant) so list ordering tracks the edit. Fixtures set
+        // updated_at = created_at in an earlier transaction; the trigger's
+        // now() is this probe's (later) transaction time. Compared in SQL —
+        // microsecond precision, immune to JS Date stringification.
+        const bumped = await query(
+          c,
+          "select (updated_at > created_at) as bumped from bookings where id = $1",
+          [FX.bookings.bookingA],
+        );
+        if (!bumped.rows[0].bumped)
+          fail("updated_at not bumped by the title edit (trigger missing?)");
       });
     },
   },
@@ -875,6 +906,51 @@ const assertions: Assertion[] = [
     },
   },
   {
+    // FK cascades run as table owner and bypass RLS entirely, so booking
+    // history is pinned by RESTRICT FKs and the delete path is closed at the
+    // grant layer too. Robust to whichever layer fires first: the delete must
+    // simply not succeed, and history must be intact afterwards.
+    name: "creator_cannot_delete_storefront_with_history",
+    run: async (ctx) => {
+      const countHistory = async () => {
+        const r = await ownerControl(
+          ctx,
+          "select (select count(*) from bookings) + (select count(*) from booking_events) + (select count(*) from messages) as n",
+        );
+        return Number(r.rows[0].n);
+      };
+      const before = await countHistory();
+      await asUser(ctx, FX.users.creatorAOwner, "creator", async (c) => {
+        const r = await query(c, "delete from creator_profiles where id = $1", [
+          FX.creators.creatorA,
+        ]);
+        if (!r.state && r.rowCount > 0)
+          fail("creator deleted their storefront — booking history cascade is open");
+      });
+      const after = await countHistory();
+      if (after !== before) fail(`history changed: ${before} -> ${after} rows`);
+    },
+  },
+  {
+    name: "withuser_guc_is_transaction_local",
+    run: async (ctx) => {
+      const scan = withUserGucScanViolations();
+      if (scan.length) fail(`rls.ts set_config not transaction-local: ${scan.join("; ")}`);
+      // and the real withUser round-trips the identity inside its transaction
+      const { withUser } = await import("../src/db/rls");
+      const { sql } = await import("drizzle-orm");
+      const seen = await withUser(
+        { userId: FX.users.brandA, role: "brand" },
+        async (tx) => {
+          const r = await tx.execute(sql`select app_uid()::text as uid`);
+          return (r.rows[0] as { uid: string | null }).uid;
+        },
+      );
+      if (seen !== FX.users.brandA) fail(`withUser identity not visible in-tx: ${seen}`);
+      void ctx;
+    },
+  },
+  {
     name: "import_ban_scan",
     run: async () => {
       const v = importBanViolations();
@@ -1084,16 +1160,69 @@ const canaryRows: CanaryRow[] = [
   },
   {
     id: 13,
-    label: "src/lib file laundering a private db import",
+    label: "src/lib file laundering a private db import (dynamic import())",
     flips: ["import_ban_scan"],
     apply: async () => {
       writeFileSync(
         CANARY_PROBE_FILE,
-        `import { getAppPool } from "../db/client.internal";\nexport const leak = getAppPool;\n`,
+        `export const leak = () => import("../db/client.internal");\n`,
       );
     },
     revert: async () => {
       rmSync(CANARY_PROBE_FILE, { force: true });
+    },
+  },
+  {
+    id: 14,
+    label: "storefront delete re-opened (grant + policy + cascade FKs restored)",
+    // Compound like row 8: RESTRICT FKs, absent grant, and absent policy are
+    // three independent layers — the true fail-open needs all of them gone.
+    flips: ["creator_cannot_delete_storefront_with_history"],
+    apply: (ctx) =>
+      ownerExec(
+        ctx,
+        "GRANT DELETE ON creator_profiles TO app_user",
+        "CREATE POLICY creator_profiles_del ON creator_profiles FOR DELETE TO app_user USING (user_id = app_uid())",
+        "ALTER TABLE bookings DROP CONSTRAINT bookings_creator_id_creator_profiles_id_fk",
+        `ALTER TABLE bookings ADD CONSTRAINT bookings_creator_id_creator_profiles_id_fk
+           FOREIGN KEY (creator_id) REFERENCES creator_profiles(id) ON DELETE cascade`,
+        "ALTER TABLE reviews DROP CONSTRAINT reviews_creator_id_creator_profiles_id_fk",
+        `ALTER TABLE reviews ADD CONSTRAINT reviews_creator_id_creator_profiles_id_fk
+           FOREIGN KEY (creator_id) REFERENCES creator_profiles(id) ON DELETE cascade`,
+      ),
+    revert: (ctx) =>
+      ownerExec(
+        ctx,
+        "ALTER TABLE bookings DROP CONSTRAINT bookings_creator_id_creator_profiles_id_fk",
+        `ALTER TABLE bookings ADD CONSTRAINT bookings_creator_id_creator_profiles_id_fk
+           FOREIGN KEY (creator_id) REFERENCES creator_profiles(id) ON DELETE restrict`,
+        "ALTER TABLE reviews DROP CONSTRAINT reviews_creator_id_creator_profiles_id_fk",
+        `ALTER TABLE reviews ADD CONSTRAINT reviews_creator_id_creator_profiles_id_fk
+           FOREIGN KEY (creator_id) REFERENCES creator_profiles(id) ON DELETE restrict`,
+        "DROP POLICY creator_profiles_del ON creator_profiles",
+        "REVOKE DELETE ON creator_profiles FROM app_user",
+      ),
+  },
+  {
+    id: 15,
+    label: "withUser set_config goes session-scoped (is_local dropped)",
+    flips: ["withuser_guc_is_transaction_local"],
+    apply: async () => {
+      const p = path.join(SRC, "db", "rls.ts");
+      const original = readFileSync(p, "utf8");
+      writeFileSync(p + ".canary-backup", original);
+      writeFileSync(
+        p,
+        original.replace(
+          /set_config\('app\.user_id', \$1, true\), set_config\('app\.user_role', \$2, true\)/,
+          "set_config('app.user_id', $1, false), set_config('app.user_role', $2, false)",
+        ),
+      );
+    },
+    revert: async () => {
+      const p = path.join(SRC, "db", "rls.ts");
+      writeFileSync(p, readFileSync(p + ".canary-backup", "utf8"));
+      rmSync(p + ".canary-backup", { force: true });
     },
   },
 ];
@@ -1246,6 +1375,12 @@ async function main(): Promise<void> {
         clientMod._closeAppPool(),
       ]);
       rmSync(CANARY_PROBE_FILE, { force: true });
+      // if a crash interrupted canary row 15, restore rls.ts from its backup
+      const gucBackup = path.join(SRC, "db", "rls.ts.canary-backup");
+      if (existsSync(gucBackup)) {
+        writeFileSync(path.join(SRC, "db", "rls.ts"), readFileSync(gucBackup, "utf8"));
+        rmSync(gucBackup, { force: true });
+      }
     }
   });
 }

@@ -122,6 +122,23 @@ export function StorefrontForm({ storefront }: { storefront: CreatorProfile | nu
   );
 }
 
+/** hidden "false" + checkbox "true" — unchecking really submits false. */
+function ActiveToggle({ defaultChecked }: { defaultChecked: boolean }) {
+  return (
+    <label className="flex items-center gap-2 text-sm text-text-muted">
+      <input type="hidden" name="active" value="false" />
+      <input
+        type="checkbox"
+        name="active"
+        value="true"
+        defaultChecked={defaultChecked}
+        className="accent-[var(--color-beam)]"
+      />
+      Active (bookable)
+    </label>
+  );
+}
+
 function PackageFields({ pkg }: { pkg?: Package }) {
   return (
     <>
@@ -169,50 +186,47 @@ function PackageFields({ pkg }: { pkg?: Package }) {
         <Label>Description</Label>
         <Textarea name="description" maxLength={4000} defaultValue={pkg?.description ?? ""} />
       </div>
-      {pkg && (
-        <label className="flex items-center gap-2 text-sm text-text-muted">
-          <input
-            type="checkbox"
-            name="active"
-            value="true"
-            defaultChecked={pkg.active}
-            className="accent-[var(--color-beam)]"
-          />
-          Active (bookable)
-          <input type="hidden" name="activeFallback" value="false" />
-        </label>
-      )}
+      {pkg && <ActiveToggle defaultChecked={pkg.active} />}
     </>
   );
 }
 
-export function PackageEditor({ packages }: { packages: Package[] }) {
+/** Each row owns its useActionState so errors render on the form they belong to. */
+function PackageRowForm({ pkg }: { pkg?: Package }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     upsertPackageAction,
     {},
   );
   return (
+    <form action={formAction} className={pkg ? "space-y-3 border-b border-line pb-6" : "space-y-3"}>
+      {!pkg && (
+        <h3 className="text-sm font-medium uppercase tracking-wide text-text-faint">
+          Add a package
+        </h3>
+      )}
+      <PackageFields pkg={pkg} />
+      <FieldError message={state.error} />
+      <Button
+        type="submit"
+        variant={pkg ? "secondary" : "primary"}
+        size={pkg ? "sm" : "md"}
+        disabled={pending}
+      >
+        {pending ? "…" : pkg ? "Save changes" : "Add package"}
+      </Button>
+    </form>
+  );
+}
+
+export function PackageEditor({ packages }: { packages: Package[] }) {
+  return (
     <Card>
       <h2 className="font-display text-xl text-text">Packages</h2>
       <div className="mt-4 space-y-6">
         {packages.map((pkg) => (
-          <form key={pkg.id} action={formAction} className="space-y-3 border-b border-line pb-6">
-            <PackageFields pkg={pkg} />
-            <Button type="submit" variant="secondary" size="sm" disabled={pending}>
-              Save changes
-            </Button>
-          </form>
+          <PackageRowForm key={pkg.id} pkg={pkg} />
         ))}
-        <form action={formAction} className="space-y-3">
-          <h3 className="text-sm font-medium uppercase tracking-wide text-text-faint">
-            Add a package
-          </h3>
-          <PackageFields />
-          <FieldError message={state.error} />
-          <Button type="submit" disabled={pending}>
-            {pending ? "…" : "Add package"}
-          </Button>
-        </form>
+        <PackageRowForm />
       </div>
     </Card>
   );
@@ -249,40 +263,50 @@ function RightsFields({ opt }: { opt?: UsageRightsOption }) {
           placeholder="Organic social, 12 months, worldwide"
         />
       </div>
+      {opt && <ActiveToggle defaultChecked={opt.active} />}
     </>
   );
 }
 
-export function RightsEditor({ options }: { options: UsageRightsOption[] }) {
+function RightsRowForm({ opt }: { opt?: UsageRightsOption }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     upsertUsageRightsAction,
     {},
   );
   return (
+    <form action={formAction} className={opt ? "space-y-3 border-b border-line pb-6" : "space-y-3"}>
+      {!opt && (
+        <h3 className="text-sm font-medium uppercase tracking-wide text-text-faint">
+          Add an option
+        </h3>
+      )}
+      <RightsFields opt={opt} />
+      <FieldError message={state.error} />
+      <Button
+        type="submit"
+        variant={opt ? "secondary" : "primary"}
+        size={opt ? "sm" : "md"}
+        disabled={pending}
+      >
+        {pending ? "…" : opt ? "Save changes" : "Add option"}
+      </Button>
+    </form>
+  );
+}
+
+export function RightsEditor({ options }: { options: UsageRightsOption[] }) {
+  return (
     <Card>
       <h2 className="font-display text-xl text-text">Usage rights options</h2>
       <p className="mt-1 text-sm text-text-muted">
-        Every booking picks exactly one — price it into the delta.
+        Every booking picks exactly one — price it into the delta. A package is
+        only bookable while at least one option is active.
       </p>
       <div className="mt-4 space-y-6">
         {options.map((opt) => (
-          <form key={opt.id} action={formAction} className="space-y-3 border-b border-line pb-6">
-            <RightsFields opt={opt} />
-            <Button type="submit" variant="secondary" size="sm" disabled={pending}>
-              Save changes
-            </Button>
-          </form>
+          <RightsRowForm key={opt.id} opt={opt} />
         ))}
-        <form action={formAction} className="space-y-3">
-          <h3 className="text-sm font-medium uppercase tracking-wide text-text-faint">
-            Add an option
-          </h3>
-          <RightsFields />
-          <FieldError message={state.error} />
-          <Button type="submit" disabled={pending}>
-            {pending ? "…" : "Add option"}
-          </Button>
-        </form>
+        <RightsRowForm />
       </div>
     </Card>
   );
