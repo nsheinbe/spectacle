@@ -1,6 +1,6 @@
 {
-  "id": "4f4cefff-d740-487e-8a1e-fde425af2784",
-  "prevId": "a525cd3f-8eab-4af4-827d-2ad5e8ffe6d0",
+  "id": "3f80c40b-81a0-4be6-bb3a-15d0ce06d5f0",
+  "prevId": "f6d6c8f2-06d2-4b83-99a3-38ca986b18ac",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -14,6 +14,12 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
+        },
+        "issuer": {
+          "name": "issuer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         },
         "account_id": {
           "name": "account_id",

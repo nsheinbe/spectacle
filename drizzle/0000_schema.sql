@@ -4,6 +4,7 @@ CREATE TYPE "public"."theme" AS ENUM('projection', 'fooh', 'anamorphic', 'drone'
 CREATE TYPE "public"."user_role" AS ENUM('brand', 'creator', 'admin');--> statement-breakpoint
 CREATE TABLE "account" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"issuer" text NOT NULL,
 	"account_id" text NOT NULL,
 	"provider_id" text NOT NULL,
 	"user_id" uuid NOT NULL,

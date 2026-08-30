@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  gates:
+    runs-on: ubuntu-24.04
+    env:
+      PGBIN: /usr/lib/postgresql/16/bin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install PostgreSQL 16
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends postgresql-16
+          sudo systemctl stop postgresql || true
+      - run: pnpm install --frozen-lockfile
+      # The security gates: allow/deny matrix + every fail-open canary row.
+      # Everything DB-backed runs against an ephemeral initdb'd PG16 cluster
+      # via the same bootstrap + journaled-migration path production uses.
+      - run: pnpm verify:gates:canary
+      - run: pnpm verify:themes
+      - run: pnpm test
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm build

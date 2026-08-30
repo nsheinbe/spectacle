@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -71,20 +71,18 @@ export async function createBookingAction(
     if (!rights) return null;
     const priceCents = pkg.priceCents + rights.priceDeltaCents;
     const feeCents = Math.floor((priceCents * env.PLATFORM_FEE_BPS) / 10_000);
-    const [created] = await tx
-      .insert(bookings)
-      .values({
-        brandId: session.userId,
-        creatorId: pkg.creatorId,
-        packageId: pkg.id,
-        usageRightsOptionId: rights.id,
-        title: input.title,
-        brief: input.brief,
-        priceCents,
-        feeCents,
-      })
-      .returning({ id: bookings.id });
-    return created?.id ?? null;
+    // Raw SQL, deliberately: drizzle's insert() names EVERY column (with
+    // DEFAULT for the unspecified), and Postgres column-level INSERT
+    // privileges cover every column named in the list — which would trip the
+    // bookings column allowlist that keeps status/payment_state unwritable.
+    const created = await tx.execute(sql`
+      insert into bookings
+        (brand_id, creator_id, package_id, usage_rights_option_id, title, brief, price_cents, fee_cents)
+      values
+        (${session.userId}, ${pkg.creatorId}, ${pkg.id}, ${rights.id}, ${input.title}, ${input.brief}, ${priceCents}, ${feeCents})
+      returning id
+    `);
+    return (created.rows[0] as { id: string } | undefined)?.id ?? null;
   });
 
   if (!bookingId) return { error: "That package is no longer available." };
