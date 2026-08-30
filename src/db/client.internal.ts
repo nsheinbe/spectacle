@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 
-import { need } from "@/lib/env";
+import { need } from "../lib/env";
 
 /**
  * PRIVATE MODULE — do not import outside src/db/**.
