@@ -1,0 +1,31 @@
+/*
+ * Spectacle design tokens — the ONLY place raw hex values live.
+ * Platform chrome tokens on :root; stage tokens are set per-theme by
+ * ThemeProvider, scoped to [data-stage] only (see src/themes/).
+ * The booking rail carries its own constant background (--color-ink)
+ * regardless of the active stage theme — constant contrast by construction.
+ */
+:root {
+  /* chrome */
+  --color-ink: #1c1710;
+  --color-canvas: #14100b;
+  --color-surface: #221c13;
+  --color-surface-raised: #2b2417;
+  --color-line: #3a3222;
+  --color-text: #f4ede0;
+  --color-text-muted: #c9bda4;
+  --color-text-faint: #94886e;
+  --color-beam: #ffb24d; /* the only accent */
+  --color-beam-deep: #cc8221;
+  --color-danger: #ff7a66;
+  --color-success: #9ed48a;
+}
+
+/* stage defaults (base-dark) — themes override these under [data-stage] */
+[data-stage] {
+  --stage-canvas: #0d0b08;
+  --stage-surface: #17130d;
+  --stage-text: #f4ede0;
+  --stage-text-muted: #c9bda4;
+  --stage-accent: #ffb24d;
+}
