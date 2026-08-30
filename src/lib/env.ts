@@ -48,12 +48,8 @@ function parseEnv(): Env {
 
 export const env: Env = parseEnv();
 
-type OptionalKeys = {
-  [K in keyof Env]: undefined extends Env[K] ? K : never;
-}[keyof Env];
-
 /** Fail-fast accessor for env vars that are optional at build time but required at use time. */
-export function need<K extends OptionalKeys>(key: K): NonNullable<Env[K]> {
+export function need<K extends keyof Env>(key: K): NonNullable<Env[K]> {
   const value = env[key];
   if (value === undefined || value === "") {
     throw new Error(

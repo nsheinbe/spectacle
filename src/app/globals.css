@@ -1,0 +1,25 @@
+@import "../styles/tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-canvas text-text font-sans antialiased;
+  }
+  ::selection {
+    background: var(--color-beam);
+    color: var(--color-canvas);
+  }
+}
+
+@layer utilities {
+  /* every number in the product renders tabular */
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+}

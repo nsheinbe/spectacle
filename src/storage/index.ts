@@ -5,6 +5,7 @@ import type { StoragePort } from "./port";
 
 export { StorageForbiddenError, type StoragePort } from "./port";
 export {
+  authorizePutKey,
   DELIVERABLE_GET_TTL_SECONDS,
   isBookingParticipant,
   makeDeliverablePresigner,

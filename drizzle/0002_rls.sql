@@ -99,15 +99,24 @@ CREATE POLICY auth_verification_all ON "verification" TO auth_user USING (true) 
 --> statement-breakpoint
 
 -- ── profiles ──
--- SELECT: own row, or display fields of a published creator (backs the
--- security_invoker view; terminates — creator_profiles SELECT policies do not
--- reference profiles, so there is no policy recursion).
+-- SELECT: own row; display fields of a published creator (backs the
+-- security_invoker view); or the brand on a booking whose creator you own
+-- (counterparty visibility — the workspace shows who you're talking to).
+-- No recursion: creator_profiles/bookings SELECT policies never reference
+-- profiles. The counterparty arm restates its columns explicitly, so
+-- widening a bookings SELECT policy (canary rows 1-2) does not widen this.
 CREATE POLICY profiles_sel ON "profiles" FOR SELECT TO app_user
   USING (
     id = app_uid()
     OR EXISTS (
       SELECT 1 FROM public.creator_profiles cp
       WHERE cp.user_id = profiles.id AND cp.published
+    )
+    OR EXISTS (
+      SELECT 1
+      FROM public.bookings b
+      JOIN public.creator_profiles cp2 ON cp2.id = b.creator_id
+      WHERE b.brand_id = profiles.id AND cp2.user_id = app_uid()
     )
   );
 --> statement-breakpoint

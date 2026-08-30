@@ -523,6 +523,21 @@ const assertions: Assertion[] = [
     },
   },
   {
+    name: "creator_sees_booked_brand_profile_only",
+    run: async (ctx) => {
+      await asUser(ctx, FX.users.creatorAOwner, "creator", async (c) => {
+        const counterparty = await query(c, "select full_name from profiles where id = $1", [
+          FX.users.brandA,
+        ]);
+        if (counterparty.rowCount !== 1) fail("creator cannot see the brand on their booking");
+        const stranger = await query(c, "select full_name from profiles where id = $1", [
+          FX.users.brandB,
+        ]);
+        if (stranger.rowCount !== 0) fail("creator sees a brand they have no booking with");
+      });
+    },
+  },
+  {
     name: "app_user_cannot_touch_auth_tables",
     run: async (ctx) => {
       await asUser(ctx, FX.users.brandA, "brand", async (c) => {

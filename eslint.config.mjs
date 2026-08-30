@@ -69,7 +69,15 @@ const eslintConfig = [
   dbImportBan,
   authDbException,
   {
-    ignores: ["node_modules/**", ".next/**", "drizzle/**"],
+    ignores: ["node_modules/**", ".next/**", "drizzle/**", "next-env.d.ts"],
+  },
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+    },
   },
 ];
 
