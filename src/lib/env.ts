@@ -35,8 +35,34 @@ const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
+/**
+ * Deployment-platform aliases, resolved before validation so the rest of the
+ * codebase sees exactly one name for each value.
+ *
+ * - AUTH_SECRET is the conventional name on Vercel and what the deploy
+ *   instructions ask for; BETTER_AUTH_SECRET stays authoritative when both are
+ *   set, so an existing environment is never silently overridden.
+ * - BETTER_AUTH_URL has to be an absolute origin — it signs callback URLs and
+ *   scopes the session cookie. Vercel injects the deployment's own hostname,
+ *   which is the right answer for preview deploys. A production deployment on a
+ *   custom domain must set BETTER_AUTH_URL explicitly: VERCEL_URL there is the
+ *   deployment hostname, not the domain OAuth providers are configured with.
+ */
+function resolveAliases(source: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  const vercelHost =
+    source.VERCEL_ENV === "production"
+      ? source.VERCEL_PROJECT_PRODUCTION_URL
+      : source.VERCEL_URL;
+  return {
+    ...source,
+    BETTER_AUTH_SECRET: source.BETTER_AUTH_SECRET || source.AUTH_SECRET,
+    BETTER_AUTH_URL:
+      source.BETTER_AUTH_URL || (vercelHost ? `https://${vercelHost}` : undefined),
+  };
+}
+
 function parseEnv(): Env {
-  const result = envSchema.safeParse(process.env);
+  const result = envSchema.safeParse(resolveAliases(process.env));
   if (!result.success) {
     const issues = result.error.issues
       .map((i) => `  ${i.path.join(".")}: ${i.message}`)

@@ -231,6 +231,47 @@ function appPoolGuardScanViolations(): string[] {
   return violations;
 }
 
+/**
+ * The runtime talks to Postgres and nothing else: a connection string, a
+ * driver, SQL. No vendor SDK sits between the app and the database, and no
+ * hosted-platform client is a supported path back in.
+ *
+ * Scoped to the runtime surface — manifests, lockfile, env template, source,
+ * workflows — so prose may still discuss the alternatives. Needles are built
+ * by concatenation so this file does not match its own scan.
+ */
+function vendorClientViolations(): string[] {
+  const needles = [
+    "@" + "supabase/",
+    "SUPABASE" + "_",
+    "supabase" + " start",
+    "createClient" + "ComponentClient",
+  ];
+  const targets = [
+    path.join(ROOT, "package.json"),
+    path.join(ROOT, "pnpm-lock.yaml"),
+    path.join(ROOT, ".env.example"),
+    ...walk(SRC),
+    ...walk(path.join(ROOT, "scripts")),
+  ];
+  const wfDir = path.join(ROOT, ".github", "workflows");
+  if (existsSync(wfDir)) {
+    for (const f of readdirSync(wfDir)) targets.push(path.join(wfDir, f));
+  }
+
+  const violations: string[] = [];
+  for (const file of targets) {
+    if (!existsSync(file)) continue;
+    const text = readFileSync(file, "utf8");
+    for (const needle of needles) {
+      if (text.includes(needle)) {
+        violations.push(`${path.relative(ROOT, file)}: ${needle}`);
+      }
+    }
+  }
+  return violations;
+}
+
 function storageEnvViolations(): string[] {
   return walk(path.join(SRC, "storage"))
     .filter((f) => readFileSync(f, "utf8").includes("process.env"))
@@ -1030,6 +1071,13 @@ const assertions: Assertion[] = [
       if (v.length) fail(`drizzle-kit push/migrate referenced in: ${v.join(", ")}`);
     },
   },
+  {
+    name: "no_hosted_platform_client",
+    run: async () => {
+      const v = vendorClientViolations();
+      if (v.length) fail(`hosted-platform client/env reintroduced:\n  ${v.join("\n  ")}`);
+    },
+  },
 ];
 
 /* ────────────────────────── canary table ────────────────────────── */
@@ -1291,6 +1339,23 @@ const canaryRows: CanaryRow[] = [
       const p = path.join(SRC, "db", "rls.ts");
       writeFileSync(p, readFileSync(p + ".canary-backup", "utf8"));
       rmSync(p + ".canary-backup", { force: true });
+    },
+  },
+  {
+    id: 17,
+    label: "a hosted-platform SDK client reappears in src/",
+    flips: ["no_hosted_platform_client"],
+    apply: async () => {
+      // Built by concatenation for the same reason the scan is: this file must
+      // not match its own needles.
+      writeFileSync(
+        CANARY_PROBE_FILE,
+        `import { createClient } from "@${"supabase"}/supabase-js";\n` +
+          `export const c = createClient(process.env.${"SUPABASE"}_URL!, "");\n`,
+      );
+    },
+    revert: async () => {
+      rmSync(CANARY_PROBE_FILE, { force: true });
     },
   },
 ];
