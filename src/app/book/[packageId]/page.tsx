@@ -11,6 +11,7 @@ import {
 } from "@/db";
 import { requireSession } from "@/lib/auth/guards";
 import { env } from "@/lib/env";
+import { uuidSchema } from "@/lib/validation";
 
 export const metadata = { title: "Book" };
 export const dynamic = "force-dynamic";
@@ -22,7 +23,11 @@ export default async function BookPage({
   params: Promise<{ packageId: string }>;
 }) {
   const session = await requireSession("brand");
-  const { packageId } = await params;
+  const { packageId: rawPackageId } = await params;
+  // A non-UUID path segment would raise 22P02 in Postgres → 500; it is a 404.
+  const parsedPackageId = uuidSchema.safeParse(rawPackageId);
+  if (!parsedPackageId.success) notFound();
+  const packageId = parsedPackageId.data;
 
   const data = await withUser(
     { userId: session.userId, role: session.role },
