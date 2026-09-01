@@ -1,31 +1,38 @@
 /*
  * Spectacle design tokens — the ONLY place raw hex values live.
- * Platform chrome tokens on :root; stage tokens are set per-theme by
- * ThemeProvider, scoped to [data-stage] only (see src/themes/).
- * The booking rail carries its own constant background (--color-ink)
- * regardless of the active stage theme — constant contrast by construction.
+ * Source of truth: the live Claude Design (Home / Booking Rail / Creator
+ * Storefront / Theme Contract artboards). Platform chrome tokens on :root;
+ * stage tokens are set per-theme by ThemeProvider, scoped to [data-stage]
+ * only (see src/themes/). The booking rail carries its own constant
+ * background (--color-ink #1C1710) regardless of the active stage theme —
+ * "a dark rail on daylight concrete is the point."
  */
 :root {
   /* chrome */
-  --color-ink: #1c1710;
-  --color-canvas: #14100b;
-  --color-surface: #221c13;
-  --color-surface-raised: #2b2417;
-  --color-line: #3a3222;
-  --color-text: #f4ede0;
-  --color-text-muted: #c9bda4;
-  --color-text-faint: #94886e;
+  --color-ink: #1c1710; /* the locked rail + panel surface */
+  --color-canvas: #16130f; /* page ground */
+  --color-surface: #1a150d; /* cards */
+  --color-surface-raised: #241d13;
+  --color-deep: #120f0b; /* footer ground */
+  --color-line: #2e2820; /* ~rgba(245,237,224,.09) over canvas */
+  --color-text: #f2ebdd;
+  --color-text-strong: #f6efe1;
+  --color-text-muted: #b8ac99;
+  --color-text-faint: #8c806e;
   --color-beam: #ffb24d; /* the only accent */
-  --color-beam-deep: #cc8221;
+  --color-beam-hover: #ffc876;
+  --color-beam-soft: #ffcc85;
+  --color-beam-wash: #ffe1b0;
   --color-danger: #ff7a66;
   --color-success: #9ed48a;
 }
 
-/* stage defaults (base-dark) — themes override these under [data-stage] */
+/* stage defaults (projection contract) — themes override under [data-stage] */
 [data-stage] {
-  --stage-canvas: #0d0b08;
-  --stage-surface: #17130d;
-  --stage-text: #f4ede0;
-  --stage-text-muted: #c9bda4;
+  --stage-canvas: #16130f;
+  --stage-surface: #100d08;
+  --stage-text: #f2ebdd;
+  --stage-text-muted: #b8ac99;
+  --stage-text-faint: #8c806e;
   --stage-accent: #ffb24d;
 }
