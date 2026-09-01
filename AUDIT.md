@@ -86,17 +86,36 @@ TIER 2 = needs approval, listed under "Needs approval" below.
 - **H4** CI trigger de-duplication / concurrency.
 - **H5** Major version bumps.
 
-## Tier 1 plan (≤ 8 fixes, one commit each)
+## Tier 1 — done (8 fixes, one commit each; cap reached)
 
-1. S1 — open-redirect validator.
-2. C1 — UUID-validate `/bookings/[id]` and `/book/[packageId]` params.
-3. C3 — delete dead `loadBookingWorkspace` server action.
-4. C2 — validate `removePortfolioItemAction` id.
-5. S3 — remove hard-coded fallback storage secret.
-6. S2 — bump drizzle-orm to ^0.45.2.
-7. S6 — CI `permissions: contents: read`.
-8. C5 — `cache()` the storefront loader.
+| # | id | commit | change |
+| --- | --- | --- | --- |
+| 1 | S1 | `4feb3e1` | `/auth` rejects `?next=` whose second char is `/` or `\`. |
+| 2 | C1 | `6323cc3` | `/bookings/[id]`, `/book/[packageId]` validate the UUID segment → 404, not 500. Adds `uuidSchema` to `src/lib/validation`. |
+| 3 | C3 | `d0d92ec` | Deleted dead `loadBookingWorkspace` (a reachable `"use server"` export). |
+| 4 | C2 | `f5a981d` | `removePortfolioItemAction` parses `id` as a UUID; returns an error state. |
+| 5 | S3 | `585b79e` | Storage signing uses `need("BETTER_AUTH_SECRET")`; the constant fallback is gone from both call sites. |
+| 6 | S2 | `17bfc17` | `drizzle-orm ^0.45.2` (lockfile: 0.44.7 → 0.45.2). Satisfies better-auth's peer range. |
+| 7 | S6 | `518e01f` | CI workflow `permissions: contents: read`. |
+| 8 | C5 | `a11e5aa` | `loadStorefront` wrapped in React `cache()`. |
+
+Each commit was followed by `pnpm typecheck` and `pnpm lint`; S2 and C5 also by
+`pnpm build`; `pnpm verify:themes` and the static gate scans re-run after the
+last fix. Nothing was reverted to Tier 2.
 
 ## Before / after
 
-Filled in at the end of Phase 2.
+| check | before (`518941b`) | after (`a11e5aa`) |
+| --- | --- | --- |
+| `pnpm typecheck` | PASS | PASS |
+| `pnpm lint` | PASS (0/0) | PASS (0/0) |
+| `pnpm build` | PASS | PASS (same 14 routes, `/c/[slug]` 987 B unchanged) |
+| `pnpm verify:themes` | GREEN | GREEN |
+| static gate scans | clean | clean |
+| `pnpm audit` | 6 advisories (3 high, 3 moderate) | 5 advisories (2 high, 3 moderate) — remaining are all `postcss` under `next` (S4) and `esbuild` under `drizzle-kit` (S5) |
+| `pnpm test`, `verify:gates:canary` | env-blocked (no PG binaries) | env-blocked — **CI on this PR is the authoritative run** |
+| `verify:neon` | no credentials | no credentials |
+
+Residual risk for reviewers: the drizzle-orm bump (S2) is the only change the
+local toolchain could not exercise against a database; CI's
+`verify:gates:canary` and the 203-cell status-machine suite cover it.
