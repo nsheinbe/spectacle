@@ -8,10 +8,12 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "neon:bootstrap": "tsx scripts/neon-bootstrap.ts",
     "migrate": "tsx scripts/migrate.ts",
     "seed": "tsx scripts/seed.ts",
     "verify:gates": "tsx scripts/verify-gates.ts",
     "verify:gates:canary": "tsx scripts/verify-gates.ts --canary",
+    "verify:neon": "tsx scripts/verify-neon.ts",
     "verify:themes": "tsx scripts/verify-themes.ts",
     "test": "vitest run"
   },
