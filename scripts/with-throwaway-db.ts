@@ -7,20 +7,25 @@ import path from "node:path";
 import { applyMigrations } from "./migrate";
 
 /**
- * Ephemeral local Postgres 16 cluster: initdb + pg_ctl into a temp datadir —
- * no docker daemon needed (docker-compose.yml pins postgres:16 for devs who
- * prefer it). Used by verify-gates and the status-machine tests so every gate
- * runs against real migrations on a real PG16, then vanishes.
+ * Ephemeral local Postgres cluster: initdb + pg_ctl into a temp datadir — no
+ * docker daemon needed (docker-compose.yml is there for devs who prefer a
+ * long-lived one). Used by verify-gates and the status-machine tests so every
+ * gate runs against real migrations on a real cluster, then vanishes.
+ *
+ * Prefer 17 — the major Neon runs. A gate suite on a different major than
+ * production can green on behaviour prod does not have, so 16 is only a
+ * fallback for a machine that has nothing newer.
  *
  * trust auth, loopback only, random free port. The initdb superuser runs
- * bootstrap-roles.sql (mirroring the privileged one-time step on Neon), the
- * app database is owned by spectacle_owner, and the journaled chain applies
- * via scripts/migrate.ts — the same path production uses.
+ * bootstrap-roles.sql (mirroring the privileged one-time step on Neon, which
+ * scripts/neon-bootstrap.ts performs as the project's default role), the app
+ * database is owned by spectacle_owner, and the journaled chain applies via
+ * scripts/migrate.ts — the same path production uses.
  */
 
 const PG_BIN =
   process.env.PGBIN ??
-  ["/usr/lib/postgresql/16/bin", "/usr/lib/postgresql/17/bin"].find((p) =>
+  ["/usr/lib/postgresql/17/bin", "/usr/lib/postgresql/16/bin"].find((p) =>
     existsSync(path.join(p, "initdb")),
   ) ??
   "";

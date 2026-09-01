@@ -2,7 +2,7 @@ import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
 import { need } from "../lib/env";
-import { getAppPool } from "./client.internal";
+import { assertAppPoolIsUnprivileged, getAppPool } from "./client.internal";
 import * as schema from "./schema";
 import type { UserRole } from "./schema";
 
@@ -37,6 +37,10 @@ export async function withUser<T>(
   session: SessionIdentity | null,
   fn: (tx: Db) => Promise<T>,
 ): Promise<T> {
+  // Fail closed before the first tenant row is read: if DATABASE_URL turns out
+  // to name a role that bypasses RLS, every policy below is inert and the
+  // failure is silent. One round trip per process — see client.internal.ts.
+  await assertAppPoolIsUnprivileged();
   const client = await getAppPool().connect();
   try {
     await client.query("BEGIN");

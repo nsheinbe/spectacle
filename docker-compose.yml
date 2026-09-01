@@ -1,8 +1,8 @@
 # Optional dev database (the scripts prefer an ephemeral initdb cluster and
-# need no docker at all). Pinned to postgres:16 — same major as Neon prod.
+# need no docker at all). Pinned to postgres:17 — same major as Neon prod.
 services:
   db:
-    image: postgres:16
+    image: postgres:17
     environment:
       POSTGRES_PASSWORD: postgres
     ports:
