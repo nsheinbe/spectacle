@@ -205,6 +205,32 @@ function withUserGucScanViolations(): string[] {
   return bad;
 }
 
+/**
+ * withUser MUST run the fail-closed identity check before it hands out a
+ * connection. Unlike every other gate here, the failure this guards against
+ * produces no error and no policy violation — a privileged DATABASE_URL just
+ * returns every tenant's rows — so the behavioural half of the assertion
+ * cannot detect its own absence from withUser. This scan pins the call site.
+ */
+function appPoolGuardScanViolations(): string[] {
+  const violations: string[] = [];
+  const rls = readFileSync(path.join(SRC, "db", "rls.ts"), "utf8");
+  const guardAt = rls.indexOf("await assertAppPoolIsUnprivileged()");
+  const connectAt = rls.indexOf("getAppPool().connect()");
+  if (guardAt < 0) violations.push("rls.ts: withUser does not await assertAppPoolIsUnprivileged()");
+  else if (connectAt >= 0 && guardAt > connectAt)
+    violations.push("rls.ts: identity check runs after the connection is checked out");
+
+  const internal = readFileSync(path.join(SRC, "db", "client.internal.ts"), "utf8");
+  for (const probe of ["rolsuper", "rolbypassrls", "tableowner"]) {
+    if (!internal.includes(probe))
+      violations.push(`client.internal.ts: identity check ignores ${probe}`);
+  }
+  if (!/throw new Error\(/.test(internal))
+    violations.push("client.internal.ts: identity check does not throw");
+  return violations;
+}
+
 function storageEnvViolations(): string[] {
   return walk(path.join(SRC, "storage"))
     .filter((f) => readFileSync(f, "utf8").includes("process.env"))
@@ -951,6 +977,32 @@ const assertions: Assertion[] = [
     },
   },
   {
+    // The deployment mistake that produces no symptom: DATABASE_URL naming a
+    // role that bypasses RLS. Neon makes it the likely one — a project hands
+    // out a single default-role string that is a neon_superuser member with
+    // BYPASSRLS. Prove the app refuses that role and accepts the real one.
+    name: "app_pool_refuses_privileged_role",
+    run: async (ctx) => {
+      const scan = appPoolGuardScanViolations();
+      if (scan.length) fail(`identity check not wired: ${scan.join("; ")}`);
+
+      const { checkUnprivileged } = await import("../src/db/client.internal");
+
+      // spectacle_owner owns every table, so it bypasses RLS under plain
+      // ENABLE — the exact shape the guard exists to reject.
+      let rejected = false;
+      try {
+        await checkUnprivileged(ctx.ownerPool);
+      } catch {
+        rejected = true;
+      }
+      if (!rejected) fail("identity check ACCEPTED the table-owning role");
+
+      // ...and must not cry wolf on the role the app is supposed to use.
+      await checkUnprivileged(ctx.appPool);
+    },
+  },
+  {
     name: "import_ban_scan",
     run: async () => {
       const v = importBanViolations();
@@ -1218,6 +1270,22 @@ const canaryRows: CanaryRow[] = [
           "set_config('app.user_id', $1, false), set_config('app.user_role', $2, false)",
         ),
       );
+    },
+    revert: async () => {
+      const p = path.join(SRC, "db", "rls.ts");
+      writeFileSync(p, readFileSync(p + ".canary-backup", "utf8"));
+      rmSync(p + ".canary-backup", { force: true });
+    },
+  },
+  {
+    id: 16,
+    label: "withUser stops checking that DATABASE_URL is an unprivileged role",
+    flips: ["app_pool_refuses_privileged_role"],
+    apply: async () => {
+      const p = path.join(SRC, "db", "rls.ts");
+      const original = readFileSync(p, "utf8");
+      writeFileSync(p + ".canary-backup", original);
+      writeFileSync(p, original.replace(/^\s*await assertAppPoolIsUnprivileged\(\);\n/m, ""));
     },
     revert: async () => {
       const p = path.join(SRC, "db", "rls.ts");

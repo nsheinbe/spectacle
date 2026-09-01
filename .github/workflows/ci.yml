@@ -8,7 +8,7 @@ jobs:
   gates:
     runs-on: ubuntu-24.04
     env:
-      PGBIN: /usr/lib/postgresql/16/bin
+      PGBIN: /usr/lib/postgresql/17/bin
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -18,14 +18,22 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - name: Install PostgreSQL 16
+      # PostgreSQL 17 — the major Neon runs. ubuntu-24.04 ships 16, so the
+      # gates would otherwise be proven on a different major than production.
+      - name: Install PostgreSQL 17
         run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] \
+            https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends postgresql-16
+          sudo apt-get install -y --no-install-recommends postgresql-17
           sudo systemctl stop postgresql || true
       - run: pnpm install --frozen-lockfile
       # The security gates: allow/deny matrix + every fail-open canary row.
-      # Everything DB-backed runs against an ephemeral initdb'd PG16 cluster
+      # Everything DB-backed runs against an ephemeral initdb'd PG17 cluster
       # via the same bootstrap + journaled-migration path production uses.
       - run: pnpm verify:gates:canary
       - run: pnpm verify:themes
