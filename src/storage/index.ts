@@ -27,7 +27,9 @@ export function getStoragePort(): StoragePort {
         })
       : makeLocalFsAdapter({
           baseUrl: env.BETTER_AUTH_URL,
-          secret: env.BETTER_AUTH_SECRET ?? "local-dev-storage-secret",
+          // Fail closed: a missing secret must never fall back to a constant
+          // that would make every signed pseudo-URL forgeable.
+          secret: need("BETTER_AUTH_SECRET"),
         });
   }
   return port;
