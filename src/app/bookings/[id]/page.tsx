@@ -18,6 +18,7 @@ import {
 import { requireSession } from "@/lib/auth/guards";
 import { availableTransitions } from "@/lib/bookings/transition";
 import { formatCents, formatDate } from "@/lib/utils";
+import { uuidSchema } from "@/lib/validation";
 
 export const metadata = { title: "Booking" };
 export const dynamic = "force-dynamic";
@@ -41,7 +42,11 @@ export default async function BookingWorkspace({
   params: Promise<{ id: string }>;
 }) {
   const session = await requireSession();
-  const { id } = await params;
+  const { id: rawId } = await params;
+  // A non-UUID path segment would raise 22P02 in Postgres → 500; it is a 404.
+  const parsedId = uuidSchema.safeParse(rawId);
+  if (!parsedId.success) notFound();
+  const id = parsedId.data;
 
   const data = await withUser(
     { userId: session.userId, role: session.role },

@@ -13,8 +13,10 @@ export default async function AuthPage({
   searchParams: Promise<{ next?: string }>;
 }) {
   const { next } = await searchParams;
-  // same-origin paths only — never redirect to another host
-  const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : null;
+  // same-origin paths only — never redirect to another host. A second
+  // character of "/" OR "\" is rejected: URL parsers treat "/\evil.com" as
+  // the protocol-relative "//evil.com".
+  const safeNext = next && /^\/(?![/\\])/.test(next) ? next : null;
   const session = await getServerSession();
   if (session) redirect(session.role ? (safeNext ?? "/dashboard") : "/onboarding");
   return (

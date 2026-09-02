@@ -3,7 +3,7 @@ import { mkdirSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { env } from "@/lib/env";
+import { need } from "@/lib/env";
 
 export const runtime = "nodejs";
 
@@ -26,8 +26,7 @@ function verify(params: URLSearchParams): { bucket: string; key: string; verb: s
   if (!verb || !bucket || !key || !exp || !sig) return null;
   if (Number(exp) < Date.now()) return null;
   if (key.includes("..")) return null;
-  const secret = env.BETTER_AUTH_SECRET ?? "local-dev-storage-secret";
-  const expected = createHmac("sha256", secret)
+  const expected = createHmac("sha256", need("BETTER_AUTH_SECRET"))
     .update(`${verb}:${bucket}:${key}:${exp}`)
     .digest("hex");
   const a = Buffer.from(sig);

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { eq, and, asc, desc } from "drizzle-orm";
 
 import { BookingRail } from "@/components/rail/booking-rail";
@@ -20,9 +21,10 @@ export const dynamic = "force-dynamic";
 /**
  * Public themed storefront. Anonymous read path: withUser(null) — RLS shows
  * only published creators; missing and unpublished slugs both 404 with the
- * SAME response (no existence oracle).
+ * SAME response (no existence oracle). React cache(): generateMetadata and
+ * the page share one load per request instead of two transactions.
  */
-async function loadStorefront(slug: string) {
+const loadStorefront = cache(async (slug: string) => {
   return withUser(null, async (tx) => {
     const [creator] = await tx
       .select()
@@ -60,7 +62,7 @@ async function loadStorefront(slug: string) {
     ]);
     return { creator, pkgs, rights, portfolio, revs };
   });
-}
+});
 
 export async function generateMetadata({
   params,

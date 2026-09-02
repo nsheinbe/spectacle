@@ -21,6 +21,9 @@ export const RESERVED_SLUGS = new Set([
   "spectacle",
 ]);
 
+/** Route params and form ids that name a row — Postgres raises 22P02 on anything else. */
+export const uuidSchema = z.string().uuid();
+
 export const slugSchema = z
   .string()
   .regex(/^[a-z0-9-]{3,40}$/, "3-40 chars: lowercase letters, digits, hyphens")

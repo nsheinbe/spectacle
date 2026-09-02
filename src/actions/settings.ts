@@ -18,6 +18,7 @@ import {
   packageSchema,
   profileUpdateSchema,
   usageRightsSchema,
+  uuidSchema,
 } from "@/lib/validation";
 
 export type ActionState = { error?: string; ok?: boolean };
@@ -238,10 +239,10 @@ export async function removePortfolioItemAction(
   const session = await getServerSession();
   if (!session) redirect("/auth");
   if (session.role !== "creator") return { error: "Creators only." };
-  const id = String(formData.get("id") ?? "");
-  if (!id) return { error: "Missing item" };
+  const id = uuidSchema.safeParse(formData.get("id"));
+  if (!id.success) return { error: "Missing item" };
   await withUser(toIdentity(session), async (tx) => {
-    await tx.delete(portfolioItems).where(eq(portfolioItems.id, id));
+    await tx.delete(portfolioItems).where(eq(portfolioItems.id, id.data));
   });
   revalidatePath("/settings");
   return { ok: true };

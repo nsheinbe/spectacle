@@ -6,7 +6,6 @@ import { redirect } from "next/navigation";
 
 import {
   bookings,
-  creatorProfiles,
   messages,
   packages,
   usageRightsOptions,
@@ -169,22 +168,4 @@ export async function updateBriefAction(
   }
   revalidatePath(`/bookings/${parsed.data.bookingId}`);
   return {};
-}
-
-/** Data loader shared by the workspace page (RLS scopes everything). */
-export async function loadBookingWorkspace(bookingId: string) {
-  const session = await getServerSession();
-  if (!session || !session.role) return null;
-  return withUser(toIdentity(session), async (tx) => {
-    const [booking] = await tx
-      .select()
-      .from(bookings)
-      .where(eq(bookings.id, bookingId));
-    if (!booking) return null;
-    const [creator] = await tx
-      .select()
-      .from(creatorProfiles)
-      .where(eq(creatorProfiles.id, booking.creatorId));
-    return { booking, creator: creator ?? null };
-  });
 }
