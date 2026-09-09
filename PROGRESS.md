@@ -6,22 +6,24 @@ when a box changes — not only at the end of a phase.
 Plan, acceptance tests, and stop conditions live in
 [`BUILD-PLAN.md`](BUILD-PLAN.md). This file only tracks state.
 
-**Last updated:** 9 September 2026 · Phase 2 open rails on
-`cursor/phase-2-open-rails-aa77` against `main` @ `76c0f61`
+**Last updated:** 9 September 2026 · Phase 3 uploads + discovery on
+`cursor/phase-3-uploads-discovery-11cc` against `main` @ `ecabddc`
 
 ---
 
 ## Now
 
-BUILD-PLAN Phase 2 — open rails, self-host, fee policy — is **done in this
-PR**. Self-host is a documented path (`SELF-HOST.md`) followed in CI by
-`pnpm verify:self-host`. Fee policy is in the repo (`FEE-POLICY.md`);
-`fee_bps` stays **1000**. Language rules hold in `src/`, README, and the
-new docs.
+BUILD-PLAN Phase 3 — deliverable uploads and discovery — is **done in this
+PR**. A creator participant can upload a version in the booking workspace
+through the existing presign port; the brand downloads via `presignGet`;
+strangers get 403. `/browse` is a real list of published storefronts when
+`FEATURE_BROWSE=true`, and still 404s when the flag is false (default
+**false**). LocalFs remains the no-R2 path.
 
-**Next implementation:**
-[BUILD-PLAN Phase 3 — Deliverable uploads and discovery](BUILD-PLAN.md#phase-3--deliverable-uploads-and-discovery).
-One phase, one PR, hard stop. Do not start Phase 4.
+**Next implementation is parked / hard-gated — do not start it:**
+[BUILD-PLAN Phase 4 — Stripe system edges](BUILD-PLAN.md#phase-4--stripe-system-edges-hard-gated).
+Needs the Stripe account and legal-entity gates. `awaiting_payment→funded`
+stays disabled.
 
 ---
 
@@ -31,8 +33,8 @@ One phase, one PR, hard stop. Do not start Phase 4.
 | --- | --- | --- | --- |
 | — | Marketplace foundation (README Phase 1) | **Done** on `main` @ `9cb5b50` | Yes — see inventory in BUILD-PLAN §1 |
 | 1 | Design import (remaining) | **Done** on `main` @ `76c0f61` | Yes — four files are the running UI; copy is honest; existing gates still apply |
-| 2 | Open rails, self-host, fee policy | **Done — this PR** | Yes — self-host doc followed in CI; fee policy in the repo |
-| 3 | Deliverable uploads and discovery | **Active — not started** | No |
+| 2 | Open rails, self-host, fee policy | **Done** on `main` @ `ecabddc` | Yes — self-host doc followed in CI; fee policy in the repo |
+| 3 | Deliverable uploads and discovery | **Done — this PR** | Yes — workspace upload writes `deliverables`; `/browse` is flag-true UI |
 | 4 | Stripe system edges | Scheduled — **hard-gated** | — |
 | — | Briefs marketplace | Parked | — |
 | — | Rename off "Spectacle" | Parked | — |
@@ -86,11 +88,11 @@ policy is in the repo.
 
 Do not start until Phase 2 is marked done above.
 
-- [ ] Workspace upload writes a `deliverables` row through the existing presign port
-- [ ] Participant download via `presignGet`; stranger 403
-- [ ] `/browse` is a real page when `FEATURE_BROWSE=true`
-- [ ] `/browse` stays 404 when the flag is false (default false)
-- [ ] No `awaiting_payment→funded` in this phase
+- [x] Workspace upload writes a `deliverables` row through the existing presign port
+- [x] Participant download via `presignGet`; stranger 403
+- [x] `/browse` is a real page when `FEATURE_BROWSE=true`
+- [x] `/browse` stays 404 when the flag is false (default false)
+- [x] No `awaiting_payment→funded` in this phase
 
 **Phase 3 closes when** one booking shows a real uploaded version and browse
 is flag-true UI rather than a hard `notFound()`.
@@ -133,6 +135,7 @@ Append-only. Date, what, why, what would reverse it.
 | 2026-09-09 | Projection stage tokens aligned to Theme Contract (`#16130F` / `#100D08` / `#F2EBDD` / `#FFB24D`) | Honour the contract without inventing stub-theme art direction (still parked) | Low |
 | 2026-09-09 | Home + storefront beams are CSS custom properties + pointer, not a second rAF loop | verify-themes allows one declared rAF (projection signature); Design beam must still exist | Medium if a registered second loop is added |
 | 2026-09-09 | Keep `platform_config.fee_bps` default **1000** | Phase 2 policy text; no product decision to change the take | Low — record here before changing the default |
+| 2026-09-09 | `/browse` is real UI when `FEATURE_BROWSE=true`; default stays **false** | Phase 3 stop condition; no invented ratings/GMV; homepage/nav link only when the flag is on | Low — turn the flag on in host env when the operator wants a directory |
 
 **Do not guess:**
 
@@ -151,6 +154,7 @@ Append-only. Date, what, why, what would reverse it.
 | 2026-09-09 | `BUILD-PLAN.md` and `PROGRESS.md` added against `main` @ `9cb5b50`. Honest seed: marketplace+RLS done; Design tokens 1/n; `/` redirects to `/dashboard`; Apache-2.0 public; self-host + fee policy missing; next impl = BUILD-PLAN Phase 1. Docs only — no product code. |
 | 2026-09-09 | Phase 1 Design import: `design/*.dc.html` at `b670fc8`; `/` is Home + `LAUNCH_COPY`; rail + `/c/[slug]` match the artboards; Theme Contract honoured; `FEATURE_BROWSE` still false. Honesty deviations logged above. |
 | 2026-09-09 | Phase 2 open rails: `SELF-HOST.md` + `FEE-POLICY.md`; compose may run the app (`--profile app`); `pnpm verify:self-host` records bootstrap → migrate → seed → `next start` on throwaway PG17. `fee_bps` stays 1000. No Stripe. |
+| 2026-09-09 | Phase 3 uploads + discovery: workspace creator PUT via existing presign port writes `deliverables`; participant `presignGet` / stranger 403; `/browse` lists published storefronts when `FEATURE_BROWSE=true` (default false). No Stripe. LocalFs remains the no-R2 path. |
 
 ---
 

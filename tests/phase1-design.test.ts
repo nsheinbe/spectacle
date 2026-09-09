@@ -13,11 +13,10 @@ function read(rel: string): string {
 }
 
 describe("Phase 1 Design import — honesty + flags", () => {
-  it("FEATURE_BROWSE stays false", () => {
+  it("FEATURE_BROWSE stays false by default; /browse 404s unless flagged", () => {
     expect(env.FEATURE_BROWSE).toBe(false);
     const browse = read("src/app/browse/page.tsx");
-    expect(browse).toContain("notFound()");
-    expect(browse).toMatch(/no UI in Phase 1 even when flagged on/);
+    expect(browse).toMatch(/if\s*\(\s*!env\.FEATURE_BROWSE\s*\)\s*notFound\(\)/);
   });
 
   it("/ is the Home artboard, not a dashboard redirect", () => {
@@ -61,10 +60,11 @@ describe("Phase 1 Design import — honesty + flags", () => {
     }
   });
 
-  it("home and rail do not link to /browse", () => {
-    expect(read("src/app/page.tsx")).not.toContain('href="/browse"');
-    expect(read("src/components/home/home-nav.tsx")).not.toContain('href="/browse"');
+  it("storefront does not advertise /browse; home links are flag-gated", () => {
     expect(read("src/app/c/[slug]/page.tsx")).not.toContain('href="/browse"');
+    expect(read("src/app/page.tsx")).toContain("showBrowse");
+    expect(read("src/components/home/home-nav.tsx")).toContain("showBrowse");
+    expect(env.FEATURE_BROWSE).toBe(false);
   });
 
   it("rail stays unthemed chrome", () => {

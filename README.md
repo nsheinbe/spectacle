@@ -7,8 +7,9 @@ database — not the application — enforces who may do what.
 
 **Phase 1** (this repo): themed creator storefronts, booking to `awaiting_payment`
 (brand accepts a proposal, then waits), and the shared workspace. **No Stripe, no
-capture, no payouts, no discovery** (`/browse` is behind `FEATURE_BROWSE=false` with
-no UI). The column is `payment_state`; the status is `funded`.
+capture, no payouts.** Discovery (`/browse`) is behind `FEATURE_BROWSE=false` by
+default and 404s until that flag is true. The column is `payment_state`; the
+status is `funded`.
 
 Open source: run it on one machine without Vercel or Neon —
 [SELF-HOST.md](SELF-HOST.md). The fee is in the open —
@@ -314,6 +315,9 @@ Numbered remaining work lives in [BUILD-PLAN.md](BUILD-PLAN.md).
 - BUILD-PLAN Phase 1 (Design import): **done**.
 - BUILD-PLAN Phase 2 (open rails — self-host + fee policy): **this repo**.
   [SELF-HOST.md](SELF-HOST.md), [FEE-POLICY.md](FEE-POLICY.md).
-- BUILD-PLAN Phase 3 (deliverable uploads + discovery): next.
+- BUILD-PLAN Phase 3 (deliverable uploads + discovery): **this repo**.
+  Creator participants upload versions in the booking workspace (LocalFs or
+  optional R2). `/browse` lists published storefronts when `FEATURE_BROWSE=true`
+  and 404s when false (default false).
 - Stripe money-in is BUILD-PLAN Phase 4 and is hard-gated. Do not start it
   from this file. Briefs stay parked.

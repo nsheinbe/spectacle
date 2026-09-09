@@ -15,9 +15,11 @@ const LINKS = [
 export function HomeNav({
   signedIn,
   primaryHref,
+  showBrowse = false,
 }: {
   signedIn: boolean;
   primaryHref: string;
+  showBrowse?: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -34,6 +36,11 @@ export function HomeNav({
                 {l.label}
               </a>
             ))}
+            {showBrowse && (
+              <Link href="/browse" className="text-text-muted hover:text-text">
+                {LAUNCH_COPY.browseCta}
+              </Link>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-[18px]">
@@ -100,6 +107,15 @@ export function HomeNav({
                 {l.label}
               </a>
             ))}
+            {showBrowse && (
+              <Link
+                href="/browse"
+                onClick={() => setOpen(false)}
+                className="py-2.5 font-display text-[30px] font-medium text-text"
+              >
+                {LAUNCH_COPY.browseCta}
+              </Link>
+            )}
             <Link
               href={signedIn ? "/dashboard" : "/auth"}
               onClick={() => setOpen(false)}
