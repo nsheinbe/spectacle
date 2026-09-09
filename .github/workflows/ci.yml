@@ -45,3 +45,6 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm build
+      # Recorded self-host path: bootstrap + migrate + seed + next start
+      # against throwaway PG17. No secrets in git; no hosted services.
+      - run: pnpm verify:self-host

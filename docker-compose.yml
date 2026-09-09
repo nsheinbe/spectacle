@@ -1,14 +1,49 @@
-# Optional dev database (the scripts prefer an ephemeral initdb cluster and
-# need no docker at all). Pinned to postgres:17 — same major as Neon prod.
+# Postgres 17 — same major as hosted Neon. Secrets stay in env, never in git.
+#
+# Database only (README quick start / host-run app):
+#   docker compose up -d db
+#
+# Full stack on one machine (app + Postgres) after a local .env exists:
+#   pnpm self-host:init-env
+#   docker compose --profile app up --build
+# See SELF-HOST.md.
 services:
   db:
     image: postgres:17
     environment:
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  app:
+    profiles: ["app"]
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      # Bootstrap-only admin URL (compose `postgres` role). Not a fourth
+      # application connection string — same shape as NEON_ADMIN_URL.
+      POSTGRES_ADMIN_URL: postgres://postgres:${POSTGRES_PASSWORD:-postgres}@db:5432/postgres
+      SPECTACLE_OWNER_PASSWORD: ${SPECTACLE_OWNER_PASSWORD:?set SPECTACLE_OWNER_PASSWORD in .env — run pnpm self-host:init-env}
+      APP_USER_PASSWORD: ${APP_USER_PASSWORD:?set APP_USER_PASSWORD in .env — run pnpm self-host:init-env}
+      AUTH_USER_PASSWORD: ${AUTH_USER_PASSWORD:?set AUTH_USER_PASSWORD in .env — run pnpm self-host:init-env}
+      DATABASE_URL: postgres://app_user:${APP_USER_PASSWORD}@db:5432/spectacle
+      DATABASE_URL_OWNER: postgres://spectacle_owner:${SPECTACLE_OWNER_PASSWORD}@db:5432/spectacle
+      AUTH_DATABASE_URL: postgres://auth_user:${AUTH_USER_PASSWORD}@db:5432/spectacle
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set BETTER_AUTH_SECRET in .env — run pnpm self-host:init-env}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+      PLATFORM_FEE_BPS: ${PLATFORM_FEE_BPS:-1000}
+      FEATURE_BROWSE: ${FEATURE_BROWSE:-false}
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   pgdata:

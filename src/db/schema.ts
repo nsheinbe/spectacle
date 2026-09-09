@@ -60,7 +60,7 @@ export type Format = (typeof FORMATS)[number];
  * adapter (checked into schema.ts once — Better Auth's own migrator never
  * runs; auth_user cannot CREATE TABLE). `role` is the additionalField the
  * role-selection action stamps via auth.api.updateUser. ids are uuid —
- * Better Auth is configured with generateId: crypto.randomUUID.
+ * Better Auth is configured with generateId: randomUUID.
  */
 
 export const user = pgTable("user", {

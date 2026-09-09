@@ -6,21 +6,22 @@ when a box changes — not only at the end of a phase.
 Plan, acceptance tests, and stop conditions live in
 [`BUILD-PLAN.md`](BUILD-PLAN.md). This file only tracks state.
 
-**Last updated:** 9 September 2026 · Phase 1 Design import on
-`cursor/phase-1-design-import-814f` (includes design commit `b670fc8`)
+**Last updated:** 9 September 2026 · Phase 2 open rails on
+`cursor/phase-2-open-rails-aa77` against `main` @ `76c0f61`
 
 ---
 
 ## Now
 
-Marketplace Phase 1 (README) is **done** on `main`. BUILD-PLAN Phase 1 —
-Design import (remaining) — is **implemented in this PR**: `/` is the Home
-artboard with `LAUNCH_COPY`, the booking rail and `/c/[slug]` follow the
-four Design files, Theme Contract (theme the stage, never the rail) is
-honoured, `FEATURE_BROWSE` stays false.
+BUILD-PLAN Phase 2 — open rails, self-host, fee policy — is **done in this
+PR**. Self-host is a documented path (`SELF-HOST.md`) followed in CI by
+`pnpm verify:self-host`. Fee policy is in the repo (`FEE-POLICY.md`);
+`fee_bps` stays **1000**. Language rules hold in `src/`, README, and the
+new docs.
 
-Honesty wins over the Design where they disagree (see decision log). Phase 2
-is next. Do not start Phase 4.
+**Next implementation:**
+[BUILD-PLAN Phase 3 — Deliverable uploads and discovery](BUILD-PLAN.md#phase-3--deliverable-uploads-and-discovery).
+One phase, one PR, hard stop. Do not start Phase 4.
 
 ---
 
@@ -29,8 +30,8 @@ is next. Do not start Phase 4.
 | # | Phase | State | Stop condition met? |
 | --- | --- | --- | --- |
 | — | Marketplace foundation (README Phase 1) | **Done** on `main` @ `9cb5b50` | Yes — see inventory in BUILD-PLAN §1 |
-| 1 | Design import (remaining) | **Done — this PR** | Yes — four files are the running UI; copy is honest; existing gates still apply |
-| 2 | Open rails, self-host, fee policy | **Active — not started** | No |
+| 1 | Design import (remaining) | **Done** on `main` @ `76c0f61` | Yes — four files are the running UI; copy is honest; existing gates still apply |
+| 2 | Open rails, self-host, fee policy | **Done — this PR** | Yes — self-host doc followed in CI; fee policy in the repo |
 | 3 | Deliverable uploads and discovery | **Active — not started** | No |
 | 4 | Stripe system edges | Scheduled — **hard-gated** | — |
 | — | Briefs marketplace | Parked | — |
@@ -71,10 +72,10 @@ acceptance tests in the plan pass.
 
 Do not start until Phase 1 is marked done above.
 
-- [ ] Self-host path documented and followed once (app + PG17 + three roles + migrate + seed + start)
-- [ ] In-repo fee policy: ~18% cut framing, actual `fee_bps` (today **1000**), DB authoritative
-- [ ] Language rules applied (no crypto/wallet/web3 brand; no `escrow` in code)
-- [ ] Secrets still private — no `.env` or connection strings in git
+- [x] Self-host path documented and followed once (app + PG17 + three roles + migrate + seed + start)
+- [x] In-repo fee policy: ~18% cut framing, actual `fee_bps` (today **1000**), DB authoritative
+- [x] Language rules applied (no crypto/wallet/web3 brand; no `escrow` in code)
+- [x] Secrets still private — no `.env` or connection strings in git
 
 **Phase 2 closes when** the self-host doc has been followed once and the fee
 policy is in the repo.
@@ -131,13 +132,14 @@ Append-only. Date, what, why, what would reverse it.
 | 2026-09-09 | Rail “Request booking” goes to `/book/[packageId]`; no fake 48-hour accept toast | The book flow is real; the Design toast is not | Low |
 | 2026-09-09 | Projection stage tokens aligned to Theme Contract (`#16130F` / `#100D08` / `#F2EBDD` / `#FFB24D`) | Honour the contract without inventing stub-theme art direction (still parked) | Low |
 | 2026-09-09 | Home + storefront beams are CSS custom properties + pointer, not a second rAF loop | verify-themes allows one declared rAF (projection signature); Design beam must still exist | Medium if a registered second loop is added |
+| 2026-09-09 | Keep `platform_config.fee_bps` default **1000** | Phase 2 policy text; no product decision to change the take | Low — record here before changing the default |
 
 **Do not guess:**
 
 | # | Question | Blocks |
 | --- | --- | --- |
 | 1 | Public product name | Rename (parked) |
-| 2 | Whether to change `fee_bps` from 1000 | Phase 2 policy text; not Phase 1 |
+| 2 | Whether to change `fee_bps` from 1000 | **Decided 2026-09-09: keep 1000.** Re-open only with a new decision-log row |
 | 3 | Charge shape (platform MOR vs Connect) once an entity exists | Phase 4 |
 
 ---
@@ -148,6 +150,7 @@ Append-only. Date, what, why, what would reverse it.
 | --- | --- |
 | 2026-09-09 | `BUILD-PLAN.md` and `PROGRESS.md` added against `main` @ `9cb5b50`. Honest seed: marketplace+RLS done; Design tokens 1/n; `/` redirects to `/dashboard`; Apache-2.0 public; self-host + fee policy missing; next impl = BUILD-PLAN Phase 1. Docs only — no product code. |
 | 2026-09-09 | Phase 1 Design import: `design/*.dc.html` at `b670fc8`; `/` is Home + `LAUNCH_COPY`; rail + `/c/[slug]` match the artboards; Theme Contract honoured; `FEATURE_BROWSE` still false. Honesty deviations logged above. |
+| 2026-09-09 | Phase 2 open rails: `SELF-HOST.md` + `FEE-POLICY.md`; compose may run the app (`--profile app`); `pnpm verify:self-host` records bootstrap → migrate → seed → `next start` on throwaway PG17. `fee_bps` stays 1000. No Stripe. |
 
 ---
 
