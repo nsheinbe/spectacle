@@ -8,11 +8,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: { default: "Spectacle", template: "%s · Spectacle" },
   description:
-    "Book spectacle advertising — projection mapping, FOOH, anamorphic, drone shows, street art — from the creators who make it.",
+    "Book a creator package from a themed storefront. Proposal, then awaiting payment. Nothing is charged today.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#14100b",
+  themeColor: "#16130f",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -23,3 +23,136 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+/* Design motion — CSS only. verify-themes forbids undeclared rAF in
+ * src/components and src/themes; pointer-follow updates custom properties. */
+@property --bx {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 60%;
+}
+@property --by {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 46%;
+}
+
+@keyframes flicker-on {
+  0% {
+    opacity: 0;
+    filter: brightness(0.2);
+  }
+  9% {
+    opacity: 0.6;
+    filter: brightness(1.7);
+  }
+  15% {
+    opacity: 0.05;
+  }
+  29% {
+    opacity: 0.9;
+    filter: brightness(1.35);
+  }
+  37% {
+    opacity: 0.18;
+  }
+  52% {
+    opacity: 1;
+    filter: brightness(1.12);
+  }
+  66% {
+    opacity: 0.72;
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+@keyframes reel-glow {
+  0% {
+    transform: translate(-5%, -3%) scale(1.06);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(6%, 4%) scale(1.14);
+    opacity: 0.82;
+  }
+  100% {
+    transform: translate(-5%, -3%) scale(1.06);
+    opacity: 0.5;
+  }
+}
+@keyframes scan-line {
+  0% {
+    transform: translateY(-120%);
+  }
+  100% {
+    transform: translateY(240%);
+  }
+}
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+@keyframes beam-line {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+@keyframes beam-sweep {
+  0% {
+    --bx: 56%;
+    --by: 50%;
+  }
+  50% {
+    --bx: 74%;
+    --by: 66%;
+  }
+  100% {
+    --bx: 56%;
+    --by: 50%;
+  }
+}
+
+.beam-surface {
+  --bx: 60%;
+  --by: 46%;
+}
+.beam-surface[data-sweep="1"] {
+  animation: beam-sweep 8s ease-in-out infinite;
+}
+.animate-flicker-on {
+  animation: flicker-on 0.9s ease-out both;
+}
+.animate-reel {
+  animation: reel-glow 8s ease-in-out infinite;
+}
+.animate-scan {
+  animation: scan-line 5.5s linear infinite;
+}
+.animate-live {
+  animation: live-pulse 2.4s ease-in-out infinite;
+}
+.animate-beam-line {
+  animation: beam-line 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beam-surface[data-sweep="1"],
+  .animate-flicker-on,
+  .animate-reel,
+  .animate-scan,
+  .animate-live,
+  .animate-beam-line {
+    animation: none !important;
+  }
+}

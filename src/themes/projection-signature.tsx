@@ -45,8 +45,8 @@ export function ProjectionSignature({ reducedMotion }: SignatureProps) {
       ctx.clearRect(0, 0, w, h);
       // night gradient ground
       const sky = ctx.createLinearGradient(0, 0, 0, h);
-      sky.addColorStop(0, "rgba(10, 7, 20, 0)");
-      sky.addColorStop(1, "rgba(22, 16, 40, 0.9)");
+      sky.addColorStop(0, "rgba(22, 19, 15, 0)");
+      sky.addColorStop(1, "rgba(16, 13, 8, 0.9)");
       ctx.fillStyle = sky;
       ctx.fillRect(0, 0, w, h);
       // the beam
