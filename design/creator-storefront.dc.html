@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#16130F;color:#F2EBDD;font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:#FFB24D;text-decoration:none}
+  a:hover{color:#FFE1B0}
+  ::selection{background:rgba(255,178,77,.28);color:#FFF3E2}
+  @keyframes flickerOn{0%{opacity:0;filter:brightness(.2)}9%{opacity:.6;filter:brightness(1.7)}15%{opacity:.05}29%{opacity:.9;filter:brightness(1.35)}37%{opacity:.18}52%{opacity:1;filter:brightness(1.12)}66%{opacity:.72}100%{opacity:1;filter:brightness(1)}}
+  @keyframes scan{0%{transform:translateY(-140%)}100%{transform:translateY(320%)}}
+  [data-tile]{transition:transform .3s ease}
+  [data-tile]:hover{transform:translateY(-3px)}
+  [data-store-grid]{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:clamp(28px,4vw,56px);align-items:start}
+  [data-rail-col]{position:sticky;top:90px}
+  [data-portfolio]{grid-template-columns:1fr 1fr}
+  [data-hint=coarse]{display:none}
+  @media (pointer:coarse){[data-hint=fine]{display:none}[data-hint=coarse]{display:inline}}
+  @media (max-width:900px){
+    [data-store-grid]{grid-template-columns:1fr}
+    [data-rail-col]{position:static}
+    [data-stage]{padding-bottom:96px}
+  }
+  @media (max-width:560px){[data-portfolio]{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" style="background:#16130F;color:#F2EBDD;font-family:'Hanken Grotesk',system-ui,sans-serif;min-height:100vh">
+
+  <nav style="position:sticky;top:0;z-index:700;display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 clamp(16px,3vw,32px);background:rgba(19,16,12,.94);border-bottom:1px solid rgba(245,237,224,.09)">
+    <div style="display:flex;align-items:center;gap:20px">
+      <a href="#home" style="font-family:'Bodoni Moda',serif;font-weight:600;font-size:20px;color:#F6EFE1">Spectacle</a>
+      <span style="width:1px;height:20px;background:rgba(245,237,224,.14)"></span>
+      <a href="#browse" style="display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:#B8AC99">
+        <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true"><path d="M13 6H1M1 6L6 1M1 6L6 11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        All creators
+      </a>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;color:#5C5346;letter-spacing:.02em">spectacle.co/c/ludo-frantz</span>
+      <button style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;background:transparent;color:#DDD3C2;border:1px solid rgba(245,237,224,.18);border-radius:5px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" style-hover="border-color:rgba(255,178,77,.5);color:#FFE1B0">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M10 4.5C11 4.5 11.8 3.7 11.8 2.7C11.8 1.8 11 1 10 1C9 1 8.2 1.8 8.2 2.7C8.2 2.9 8.2 3 8.3 3.2L5 5.1M5 5.1C4.7 4.8 4.2 4.5 3.7 4.5C2.7 4.5 2 5.3 2 6.3C2 7.2 2.7 8 3.7 8C4.2 8 4.7 7.8 5 7.4M5 5.1C5.2 5.4 5.4 5.8 5.4 6.3C5.4 6.7 5.2 7.1 5 7.4M5 7.4L8.3 9.3C8.2 9.5 8.2 9.6 8.2 9.8C8.2 10.8 9 11.5 10 11.5C11 11.5 11.8 10.8 11.8 9.8C11.8 8.8 11 8 10 8C9.5 8 9 8.3 8.7 8.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Share
+      </button>
+    </div>
+  </nav>
+
+  <div style="max-width:1200px;margin:0 auto;padding:clamp(20px,3vw,32px) clamp(16px,3vw,32px) 64px">
+    <div data-store-grid="1">
+
+      <!-- STAGE (theme: projection) -->
+      <main data-stage="1">
+
+        <!-- HERO — 16:9 projected surface, unlit until the beam lands -->
+        <div data-hero="1" style="position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:12px;background:#100D08;border:1px solid rgba(245,237,224,.08);--bx:40%;--by:52%">
+          <div aria-hidden="true" style="position:absolute;inset:0;background:repeating-linear-gradient(180deg,#171208 0 30px,#120E07 30px 33px)"></div>
+          <div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(120% 120% at 50% 40%,transparent 60%,rgba(6,5,3,.6))"></div>
+
+          <!-- lit content: calibration mesh + projected work, revealed only under the beam -->
+          <div aria-hidden="true" data-lit="1" style="position:absolute;inset:0;-webkit-mask-image:radial-gradient(circle 34% at var(--bx) var(--by),#000 0%,#000 46%,transparent 76%);mask-image:radial-gradient(circle 34% at var(--bx) var(--by),#000 0%,#000 46%,transparent 76%)">
+            <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(90deg,rgba(255,214,160,.32) 0 1px,transparent 1px 30px),repeating-linear-gradient(0deg,rgba(255,214,160,.28) 0 1px,transparent 1px 30px)"></div>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:perspective(1200px) rotateX(4deg) rotateY(-7deg) scale(.98);transform-origin:50% 55%">
+              <div style="font-family:'Bodoni Moda',serif;font-weight:700;font-size:clamp(40px,9vw,120px);line-height:.9;letter-spacing:.02em;color:rgba(255,238,206,.95);text-shadow:0 0 44px rgba(255,178,77,.5)">AURAVANT</div>
+              <div style="margin-top:14px;font-size:clamp(10px,1.5vw,15px);font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:rgba(255,224,178,.85)">Sub-zero energy · out now</div>
+            </div>
+          </div>
+
+          <!-- the light itself -->
+          <div aria-hidden="true" data-beam="1" style="position:absolute;top:0;left:0;width:70%;height:120%;margin-left:-35%;margin-top:-10%;background:radial-gradient(circle at center,rgba(255,222,168,.42) 0%,rgba(255,196,120,.16) 40%,transparent 66%);pointer-events:none;will-change:transform;transform:translate3d(40%,52%,0)"></div>
+
+          <div style="position:absolute;top:16px;left:16px;display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#B8AC99">
+            <span data-live="1" style="width:6px;height:6px;border-radius:50%;background:#FFB24D"></span>Showreel
+          </div>
+          <div style="position:absolute;bottom:16px;right:16px;font-size:11px;color:#8C806E;font-variant-numeric:tabular-nums;letter-spacing:.06em">reel 01 · 01:12</div>
+          <div data-hint="fine" style="position:absolute;bottom:16px;left:16px;font-size:11px;color:#8C806E;letter-spacing:.04em">Move to sweep the beam</div>
+          <div data-hint="coarse" style="position:absolute;bottom:16px;left:16px;font-size:11px;color:#8C806E;letter-spacing:.04em">Tap to sweep the beam</div>
+        </div>
+
+        <!-- IDENTITY -->
+        <div style="margin-top:32px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <h1 style="margin:0;font-family:'Bodoni Moda',serif;font-weight:600;font-size:clamp(38px,5.4vw,66px);line-height:1;letter-spacing:-.015em;color:#F6EFE1">Ludo Frantz</h1>
+            <span title="Verified creator" style="display:inline-flex">
+              <svg width="26" height="26" viewBox="0 0 16 16" fill="none" aria-label="Verified"><path d="M8 1.2L10 2.6L12.4 2.5L13 4.8L14.8 6.3L13.9 8.5L14.8 10.7L13 12.2L12.4 14.5L10 14.4L8 15.8L6 14.4L3.6 14.5L3 12.2L1.2 10.7L2.1 8.5L1.2 6.3L3 4.8L3.6 2.5L6 2.6L8 1.2Z" fill="rgba(255,178,77,.18)" stroke="#FFB24D" stroke-width="1"/><path d="M5.5 8L7.2 9.7L10.6 6.2" stroke="#FFB24D" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+          <p style="max-width:26ch;margin:16px 0 0;font-family:'Bodoni Moda',serif;font-style:italic;font-weight:500;font-size:clamp(20px,2.4vw,28px);line-height:1.2;color:#EDD9BE">I map ads onto the surfaces nobody can buy as media.</p>
+
+          <!-- verified reach -->
+          <div style="display:flex;flex-wrap:wrap;gap:28px 40px;margin-top:28px;padding:20px 0;border-top:1px solid rgba(245,237,224,.09);border-bottom:1px solid rgba(245,237,224,.09)">
+            <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+              <div>
+                <div style="font-family:'Bodoni Moda',serif;font-weight:600;font-size:clamp(26px,3vw,36px);line-height:1;color:#F2EBDD;font-variant-numeric:tabular-nums">{{ s.v }}</div>
+                <div style="margin-top:7px;font-size:12px;letter-spacing:.02em;color:#8C806E">{{ s.l }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <!-- format tags -->
+          <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:24px">
+            <sc-for list="{{ tags }}" as="t" hint-placeholder-count="4">
+              <span style="padding:7px 14px;border:1px solid rgba(245,237,224,.16);border-radius:20px;font-size:13px;font-weight:500;color:#C6B9A4">{{ t }}</span>
+            </sc-for>
+          </div>
+
+          <p style="max-width:60ch;margin:26px 0 0;font-size:16px;line-height:1.65;color:#B8AC99">Ludo Frantz projects brand work onto the things cities forgot to sell — toilets, snowbanks, garage doors, the backs of buses. The film does the media buy the surface never could. Six years in, based in Rotterdam, shoots wherever it's dark. Files the permits, then shoots like he didn't.</p>
+        </div>
+
+        <!-- PORTFOLIO — dark until lit -->
+        <div style="margin-top:52px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px">
+            <h2 style="margin:0;font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(24px,3vw,34px);color:#F2EBDD">Selected work</h2>
+            <span style="font-size:13px;color:#8C806E;font-variant-numeric:tabular-nums">28 projects</span>
+          </div>
+          <div data-portfolio="1" style="display:grid;gap:16px">
+            <sc-for list="{{ portfolio }}" as="w" hint-placeholder-count="6">
+              <figure data-tile="1" data-index="{{ w.i }}" style="position:relative;margin:0;aspect-ratio:16/9;overflow:hidden;border-radius:10px;background:#0F0C08;border:1px solid rgba(245,237,224,.08);opacity:0">
+                <div aria-hidden="true" style="position:absolute;inset:0;background:{{ w.surface }}"></div>
+                <div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:66%;display:flex;align-items:center;justify-content:center;padding:0 16px;transform:perspective(900px) rotateY(-6deg) scale(.9)">
+                  <span style="font-family:'Bodoni Moda',serif;font-weight:700;font-size:clamp(20px,4vw,34px);letter-spacing:.03em;color:rgba(255,236,205,.9);text-shadow:0 0 26px rgba(255,178,77,.5)">{{ w.brand }}</span>
+                </div>
+                <div aria-hidden="true" data-scan="1" style="position:absolute;left:0;right:0;height:38%;background:linear-gradient(180deg,transparent,rgba(255,228,181,.12),transparent);will-change:transform"></div>
+                <div aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(9,7,4,.92) 0%,rgba(9,7,4,.35) 34%,transparent 58%)"></div>
+                <figcaption style="position:absolute;left:0;right:0;bottom:0;padding:14px 15px">
+                  <div style="font-size:14px;font-weight:600;color:#F2EBDD;letter-spacing:-.01em">{{ w.title }}</div>
+                  <div style="margin-top:3px;font-size:12px;color:#8C806E">{{ w.city }}</div>
+                </figcaption>
+              </figure>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- REVIEWS -->
+        <div style="margin-top:52px">
+          <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:20px">
+            <h2 style="margin:0;font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(24px,3vw,34px);color:#F2EBDD">Reviews</h2>
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:14px;color:#C6B9A4;font-variant-numeric:tabular-nums">
+              <svg width="13" height="13" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1L7.4 4.2L10.8 4.5L8.2 6.8L9 10.1L6 8.3L3 10.1L3.8 6.8L1.2 4.5L4.6 4.2L6 1Z" fill="#FFB24D"/></svg>
+              4.9 · 48 reviews
+            </span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <sc-for list="{{ reviews }}" as="r" hint-placeholder-count="3">
+              <blockquote style="margin:0;padding:22px 24px;background:#1A150D;border:1px solid rgba(245,237,224,.08);border-radius:11px">
+                <p style="margin:0;font-size:16px;line-height:1.6;color:#EDE4D5">“{{ r.quote }}”</p>
+                <footer style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px">
+                  <span style="font-size:13px;color:#8C806E">{{ r.by }} · <span style="color:#B8AC99">{{ r.role }}</span></span>
+                  <span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#C6B9A4;font-variant-numeric:tabular-nums">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1L7.4 4.2L10.8 4.5L8.2 6.8L9 10.1L6 8.3L3 10.1L3.8 6.8L1.2 4.5L4.6 4.2L6 1Z" fill="#FFB24D"/></svg>{{ r.rating }}
+                  </span>
+                </footer>
+              </blockquote>
+            </sc-for>
+          </div>
+        </div>
+      </main>
+
+      <!-- RAIL — locked chrome, sticky on desktop / bottom sheet on mobile -->
+      <aside data-rail-col="1">
+        <dc-import name="Booking Rail" creator-name="{{ creatorName }}" verified="{{ verified }}" reach="{{ reachRail }}" packages="{{ packages }}" hint-size="100%,780px"></dc-import>
+      </aside>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  rootRef = (el) => { this._root = el; };
+
+  data = {
+    creatorName: 'Ludo Frantz',
+    verified: true,
+    stats: [
+      { v: '1.2M', l: 'Instagram followers' },
+      { v: '3.8M', l: 'TikTok followers' },
+      { v: '51.2M', l: '30-day views' },
+      { v: '4.9', l: '48 reviews' },
+    ],
+    reachRail: [
+      { value: '1.2M', label: 'IG' },
+      { value: '3.8M', label: 'TikTok' },
+      { value: '51.2M', label: '30-day views' },
+    ],
+    tags: ['Projection mapping', 'Everyday objects', 'Documentary cut', 'Guerrilla permits'],
+    packages: [
+      { title: 'Single surface', price: 12000, turnaround: '2 weeks', revisions: '1 revision', sub: 'One object, one location, one film.' },
+      { title: 'The circuit', price: 28000, turnaround: '4 weeks', revisions: '2 revisions', sub: 'Three surfaces across a city, cut into one film.', popular: true },
+      { title: 'Citywide takeover', price: 60000, turnaround: '8 weeks', revisions: '3 revisions', sub: 'A week of nightly projections, documented as a campaign.' },
+    ],
+    portfolio: [
+      { i: 0, brand: 'AURAVANT', title: 'Auravant energy — on a snowbank', city: 'Tromsø, NO', surface: 'repeating-linear-gradient(178deg,#1b1c22 0 26px,#14151a 26px 30px)' },
+      { i: 1, brand: 'HALDEN', title: 'Halden detergent — on a laundromat window', city: 'Rotterdam, NL', surface: 'linear-gradient(150deg,#221a12,#14100a)' },
+      { i: 2, brand: 'NOVEMBER', title: 'November sneakers — on a garage door', city: 'Antwerp, BE', surface: 'repeating-linear-gradient(180deg,#1d1811 0 22px,#16110b 22px 25px)' },
+      { i: 3, brand: 'KESSLER', title: 'Kessler bank — on a public toilet', city: 'Berlin, DE', surface: 'repeating-linear-gradient(90deg,#1e1a15 0 40px,#181410 40px 42px)' },
+      { i: 4, brand: 'SUNDRY', title: 'Sundry streaming — on a grain silo', city: 'Groningen, NL', surface: 'radial-gradient(120% 80% at 50% 20%,#241d13,#120e08)' },
+      { i: 5, brand: 'VOSS & KANE', title: 'Voss & Kane perfume — on a car-park facade', city: 'Rotterdam, NL', surface: 'repeating-linear-gradient(180deg,#1c1710 0 34px,rgba(0,0,0,.4) 34px 36px,#1c1710 36px 70px)' },
+    ],
+    reviews: [
+      { quote: 'Ludo turned a snowbank into the highest-performing asset in the launch. We handed him a logo and stayed out of the way.', by: 'Priya Nandakumar', role: 'Brand Lead, Auravant', rating: '5.0' },
+      { quote: 'Three surfaces delivered in the time our agency usually spends on a deck. The toilet cut has nine million views.', by: 'Tomas Reuter', role: 'Senior Producer, Halden', rating: '4.8' },
+      { quote: 'He shoots guerrilla but files the permits. Rare combination, and it means the footage actually clears legal.', by: 'Mara Devlin', role: 'Marketing Manager, November', rating: '5.0' },
+    ],
+  };
+
+  renderVals() {
+    if (!this._vals) this._vals = Object.assign({ rootRef: this.rootRef }, this.data);
+    return this._vals;
+  }
+
+  componentDidMount() {
+    const root = this._root; if (!root) return;
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Ambient loop (the page's one) — hero projector beam. Unlit surface until light lands.
+    const hero = root.querySelector('[data-hero]');
+    const beam = hero && hero.querySelector('[data-beam]');
+    if (hero && beam) {
+      let W = 0, H = 0;
+      const measure = () => { const r = hero.getBoundingClientRect(); W = r.width; H = r.height; };
+      const place = (x, y) => {
+        beam.style.transform = `translate3d(${x}px,${y}px,0)`;
+        hero.style.setProperty('--bx', (W ? (x / W * 100) : 40) + '%');
+        hero.style.setProperty('--by', (H ? (y / H * 100) : 52) + '%');
+      };
+      measure();
+      place(W * 0.4, H * 0.52);
+      window.addEventListener('resize', () => { measure(); }, { passive: true });
+
+      if (!reduced) {
+        const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+        let raf = null, t0 = 0, interacting = false, visible = false;
+        const loop = (ts) => {
+          if (!t0) t0 = ts;
+          if (interacting || !visible) { raf = null; return; }
+          const t = (ts - t0) / 1000 * 0.9;
+          place(W * (0.42 + 0.26 * Math.sin(t)), H * (0.5 + 0.2 * Math.sin(t * 0.8 + 1)));
+          raf = requestAnimationFrame(loop);
+        };
+        const start = () => { if (!raf && visible && !interacting) { t0 = 0; raf = requestAnimationFrame(loop); } };
+        const stop = () => { if (raf) { cancelAnimationFrame(raf); raf = null; } };
+        if ('IntersectionObserver' in window) {
+          new IntersectionObserver((es) => es.forEach((e) => { visible = e.isIntersecting; visible ? start() : stop(); }), { threshold: 0.05 }).observe(hero);
+        } else { visible = true; start(); }
+        if (!coarse) hero.addEventListener('mousemove', (e) => {
+          interacting = true; stop();
+          const r = hero.getBoundingClientRect(); place(e.clientX - r.left, e.clientY - r.top);
+        });
+        hero.addEventListener('mouseleave', () => { interacting = false; start(); });
+        const follow = (e) => { const p = e.touches && e.touches[0]; if (!p) return; interacting = true; stop(); const r = hero.getBoundingClientRect(); place(p.clientX - r.left, p.clientY - r.top); };
+        hero.addEventListener('touchstart', follow, { passive: true });
+        hero.addEventListener('touchmove', follow, { passive: true });
+      }
+    }
+
+    // Live dot
+    const dot = root.querySelector('[data-live]');
+    if (dot && !reduced) { dot.style.transition = 'opacity 1.2s ease-in-out'; let on = true; setInterval(() => { on = !on; dot.style.opacity = on ? '1' : '.4'; }, 1200); }
+
+    // Portfolio — dark until lit, then flicker on like projectors warming up
+    const tiles = Array.from(root.querySelectorAll('[data-tile]'));
+    const scans = root.querySelectorAll('[data-scan]');
+    if (!reduced) scans.forEach((s, i) => { s.style.animation = `scan ${6 + i * 0.7}s linear infinite`; s.style.animationDelay = `${-i}s`; s.style.animationPlayState = 'paused'; });
+    const litTile = (el) => {
+      if (el.dataset.lit) return; el.dataset.lit = '1';
+      if (reduced) { el.style.opacity = '1'; return; }
+      const d = (parseInt(el.dataset.index, 10) || 0) % 2 * 120 + Math.floor((parseInt(el.dataset.index, 10) || 0) / 2) * 90;
+      setTimeout(() => {
+        el.style.animation = 'flickerOn .85s ease-out both';
+        const s = el.querySelector('[data-scan]'); if (s) s.style.animationPlayState = 'running';
+      }, d);
+    };
+    if ('IntersectionObserver' in window && !reduced) {
+      const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { litTile(e.target); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px', threshold: 0.2 });
+      tiles.forEach((t) => io.observe(t));
+      setTimeout(() => tiles.forEach(litTile), 2600);
+    } else { tiles.forEach((t) => { t.style.opacity = '1'; }); }
+  }
+}
+</script>
+</body>
+</html>
