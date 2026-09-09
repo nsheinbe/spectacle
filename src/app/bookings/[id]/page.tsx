@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { asc, desc, eq, inArray } from "drizzle-orm";
 
+import { DeliverablePanel } from "@/components/bookings/deliverable-panel";
 import { MessagePanel } from "@/components/bookings/message-panel";
 import { StatusActions } from "@/components/bookings/status-actions";
 import { Stepper } from "@/components/bookings/stepper";
@@ -126,7 +127,7 @@ export default async function BookingWorkspace({
               <Card className="border-beam/40">
                 <h2 className="font-display text-xl text-text">Proposal accepted</h2>
                 <p className="mt-2 text-sm leading-relaxed text-text-muted">
-                  Payment arrives in Phase 2. Nothing has been charged and nothing is
+                  Payment is not on yet. Nothing has been charged and nothing is
                   simulated — when payments launch, this booking moves to{" "}
                   <span className="text-text">Funded</span> automatically after checkout.
                 </p>
@@ -162,26 +163,19 @@ export default async function BookingWorkspace({
               <h2 className="text-sm font-medium uppercase tracking-wide text-text-faint">
                 Deliverables
               </h2>
-              <ul className="mt-3 space-y-2">
-                {files.map((f) => (
-                  <li
-                    key={f.id}
-                    className="flex items-center justify-between gap-3 rounded border border-line bg-canvas px-3 py-2 text-sm"
-                  >
-                    <span className="truncate text-text">
-                      v{f.version} · {f.fileName}
-                    </span>
-                    <span className="shrink-0 text-xs text-text-faint">
-                      {formatDate(f.createdAt)}
-                    </span>
-                  </li>
-                ))}
-                {files.length === 0 && (
-                  <li className="text-sm text-text-muted">
-                    Deliverable versions appear here once production starts (Phase 2).
-                  </li>
-                )}
-              </ul>
+              <div className="mt-3">
+                <DeliverablePanel
+                  bookingId={booking.id}
+                  canUpload={!isBrand}
+                  files={files.map((f) => ({
+                    id: f.id,
+                    version: f.version,
+                    fileName: f.fileName,
+                    storageKey: f.storageKey,
+                    createdAt: formatDate(f.createdAt),
+                  }))}
+                />
+              </div>
             </Card>
 
             <Card>

@@ -121,3 +121,24 @@ export const presignPutSchema = z.object({
   contentType: z.string().refine((m) => UPLOAD_MIME_ALLOWLIST.has(m), "Unsupported file type"),
   sizeBytes: z.number().int().min(1).max(MAX_UPLOAD_BYTES),
 });
+
+export const presignGetSchema = z.object({
+  bookingId: z.string().uuid(),
+  key: z.string().min(1).max(512),
+});
+
+export const deliverablePrepareSchema = z.object({
+  bookingId: z.string().uuid(),
+  fileName: z.string().trim().min(1).max(180),
+  contentType: z.string().refine((m) => UPLOAD_MIME_ALLOWLIST.has(m), "Unsupported file type"),
+  sizeBytes: z.number().int().min(1).max(MAX_UPLOAD_BYTES),
+});
+
+export const deliverableRecordSchema = z.object({
+  bookingId: z.string().uuid(),
+  storageKey: z.string().min(1).max(512),
+  fileName: z.string().trim().min(1).max(180),
+  mimeType: z.string().refine((m) => UPLOAD_MIME_ALLOWLIST.has(m), "Unsupported file type"),
+  sizeBytes: z.number().int().min(1).max(MAX_UPLOAD_BYTES),
+  note: z.string().trim().max(2000).default(""),
+});

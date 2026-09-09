@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 import { getServerSession } from "@/lib/auth/session";
+import { env } from "@/lib/env";
+import { LAUNCH_COPY } from "@/lib/launch-copy";
 
 /** Platform chrome — never themed. */
 export async function SiteHeader() {
@@ -12,6 +14,14 @@ export async function SiteHeader() {
           Spectacle
         </Link>
         <nav className="flex items-center gap-1 text-sm">
+          {env.FEATURE_BROWSE && (
+            <Link
+              href="/browse"
+              className="rounded px-3 py-2 text-text-muted hover:bg-surface hover:text-text"
+            >
+              {LAUNCH_COPY.browseCta}
+            </Link>
+          )}
           {session ? (
             <>
               <Link

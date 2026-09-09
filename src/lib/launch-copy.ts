@@ -8,6 +8,7 @@
  *
  *   - no invented totals, ratings, reach, or reply times
  *   - no discovery CTA while FEATURE_BROWSE is false
+ *   - /browse exists only when that flag is true (default false)
  *   - no briefs CTA (parked)
  *   - no legal-entity name
  *   - payment language matches what the app does today
@@ -91,7 +92,7 @@ export const LAUNCH_COPY = {
     },
   ] as const,
   formatsAside:
-    "Discovery is not on yet. Open a published storefront to book — there is no brief inbox in this phase.",
+    "A public directory is off by default. Open a published storefront to book — there is no brief inbox in this phase.",
 
   creatorsEyebrow: "For creators",
   creatorsHeading: "Publish packages. Receive inquiries.",
@@ -114,7 +115,19 @@ export const LAUNCH_COPY = {
 
   closeHeading: "Two ways in. Both honest.",
   closeBody:
-    "Open a published storefront if one exists on this instance, or sign in to publish one. There is no browse page and no brief marketplace yet.",
+    "Open a published storefront if one exists on this instance, or sign in to publish one. There is no brief marketplace yet.",
+
+  browseEyebrow: "Discovery",
+  browseHeading: "Published storefronts",
+  browseLead:
+    "Creators who have published a storefront on this instance. This is a directory, not a ranking — no ratings, no totals.",
+  browseEmpty:
+    "No published storefronts on this instance yet. After a seed or a creator publishes, they appear here.",
+  browseCta: "Browse storefronts",
+  browseFormatsAside:
+    "Open the directory of published storefronts to book — there is no brief inbox in this phase.",
+  browseCloseBody:
+    "Open a published storefront, or browse the directory on this instance. There is no brief marketplace yet.",
 
   footerBlurb:
     "Booking and usage-rights rails for spectacle advertising. Working name, not a final brand.",

@@ -1,62 +1,14 @@
 import Link from "next/link";
-import { and, asc, eq, inArray } from "drizzle-orm";
 
 import { HomeCreatorCard } from "@/components/home/home-creator-card";
 import { HomeNav } from "@/components/home/home-nav";
 import { BeamSurface } from "@/components/stage/beam-surface";
-import { packages, publicCreatorView, withUser } from "@/db";
 import { getServerSession } from "@/lib/auth/session";
-import { FORMAT_LABEL, LAUNCH_COPY } from "@/lib/launch-copy";
+import { env } from "@/lib/env";
+import { LAUNCH_COPY } from "@/lib/launch-copy";
+import { loadPublishedStorefronts } from "@/lib/published-storefronts";
 
 export const dynamic = "force-dynamic";
-
-type Featured = {
-  slug: string;
-  name: string;
-  format: string;
-  fromCents: number | null;
-};
-
-async function loadFeatured(): Promise<Featured[]> {
-  if (!process.env.DATABASE_URL) return [];
-  try {
-    return await withUser(null, async (tx) => {
-      const creators = await tx.select().from(publicCreatorView).limit(4);
-      const ids = creators
-        .map((c) => c.id)
-        .filter((id): id is string => Boolean(id));
-      const pkgs = ids.length
-        ? await tx
-            .select({
-              creatorId: packages.creatorId,
-              priceCents: packages.priceCents,
-            })
-            .from(packages)
-            .where(and(inArray(packages.creatorId, ids), eq(packages.active, true)))
-            .orderBy(asc(packages.priceCents))
-        : [];
-      const cheapest = new Map<string, number>();
-      for (const p of pkgs) {
-        if (!cheapest.has(p.creatorId)) cheapest.set(p.creatorId, p.priceCents);
-      }
-      return creators
-        .filter((c): c is typeof c & { slug: string; displayName: string } =>
-          Boolean(c.slug && c.displayName),
-        )
-        .map((c) => {
-          const formatKey = c.formats?.[0] ?? c.theme ?? "projection";
-          return {
-            slug: c.slug,
-            name: c.displayName,
-            format: FORMAT_LABEL[formatKey] ?? formatKey,
-            fromCents: c.id ? (cheapest.get(c.id) ?? null) : null,
-          };
-        });
-    });
-  } catch {
-    return [];
-  }
-}
 
 async function sessionOrNull() {
   try {
@@ -67,12 +19,20 @@ async function sessionOrNull() {
 }
 
 export default async function Home() {
-  const [session, featured] = await Promise.all([sessionOrNull(), loadFeatured()]);
+  const [session, featured] = await Promise.all([
+    sessionOrNull(),
+    loadPublishedStorefronts(4),
+  ]);
   const primaryHref = featured[0] ? `/c/${featured[0].slug}` : "#storefronts";
+  const showBrowse = env.FEATURE_BROWSE;
 
   return (
     <div className="min-h-dvh overflow-x-hidden bg-canvas text-text">
-      <HomeNav signedIn={Boolean(session)} primaryHref={primaryHref} />
+      <HomeNav
+        signedIn={Boolean(session)}
+        primaryHref={primaryHref}
+        showBrowse={showBrowse}
+      />
 
       <header className="relative min-h-[calc(100svh-74px)]">
         <BeamSurface
@@ -231,7 +191,7 @@ export default async function Home() {
             <div className="flex min-h-[230px] flex-col justify-end bg-surface p-7">
               <span className="font-display text-[15px] font-semibold text-text-faint">→</span>
               <p className="mb-0 mt-auto font-display text-[22px] leading-snug text-[#ede4d5]">
-                {LAUNCH_COPY.formatsAside}
+                {showBrowse ? LAUNCH_COPY.browseFormatsAside : LAUNCH_COPY.formatsAside}
               </p>
             </div>
           </div>
@@ -298,7 +258,7 @@ export default async function Home() {
             {LAUNCH_COPY.closeHeading}
           </h2>
           <p className="mx-auto mb-10 mt-6 max-w-[46ch] text-[17px] leading-relaxed text-text-muted">
-            {LAUNCH_COPY.closeBody}
+            {showBrowse ? LAUNCH_COPY.browseCloseBody : LAUNCH_COPY.closeBody}
           </p>
           <div className="flex flex-wrap justify-center gap-3.5">
             <Link
@@ -345,9 +305,15 @@ export default async function Home() {
               <a href="#how" className="text-sm text-text-muted hover:text-beam">
                 How it works
               </a>
-              <a href="#storefronts" className="text-sm text-text-muted hover:text-beam">
-                Published storefronts
-              </a>
+              {showBrowse ? (
+                <Link href="/browse" className="text-sm text-text-muted hover:text-beam">
+                  {LAUNCH_COPY.browseCta}
+                </Link>
+              ) : (
+                <a href="#storefronts" className="text-sm text-text-muted hover:text-beam">
+                  Published storefronts
+                </a>
+              )}
               <Link href="/auth" className="text-sm text-text-muted hover:text-beam">
                 Sign in
               </Link>
