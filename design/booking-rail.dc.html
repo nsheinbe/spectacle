@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500..700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>
+</helmet>
+<div style="{{ rootStyle }}">
+
+  <sc-if value="{{ showScrim }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ collapse }}" aria-hidden="true" style="position:absolute;inset:0;background:rgba(8,6,4,.62)"></div>
+  </sc-if>
+
+  <!-- COLLAPSED BOTTOM BAR (mobile) — price + Request booking always visible -->
+  <sc-if value="{{ showBar }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ barStyle }}">
+      <button onClick="{{ expand }}" aria-label="Configure booking" style="flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:2px;background:transparent;border:0;padding:0;cursor:pointer;text-align:left;font-family:'Hanken Grotesk',sans-serif">
+        <span style="display:flex;align-items:baseline;gap:7px">
+          <span style="font-size:19px;font-weight:700;color:#F6EFE1;font-variant-numeric:tabular-nums">{{ totalFmt }}</span>
+          <span style="font-size:12px;color:#8C806E">total</span>
+        </span>
+        <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#B8AC99">{{ selectedPackageTitle }}
+          <svg width="9" height="6" viewBox="0 0 9 6" fill="none" aria-hidden="true"><path d="M1 1L4.5 4.5L8 1" stroke="#8C806E" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </span>
+      </button>
+      <button onClick="{{ requestBooking }}" style="height:46px;padding:0 20px;background:#FFB24D;color:#17130E;font-size:15px;font-weight:600;border:0;border-radius:6px;cursor:pointer;font-family:'Hanken Grotesk',sans-serif" style-hover="background:#FFC876">Request booking</button>
+    </div>
+  </sc-if>
+
+  <!-- FULL PANEL (desktop always; mobile when expanded) -->
+  <sc-if value="{{ showPanel }}" hint-placeholder-val="{{ true }}">
+    <div style="{{ panelStyle }}">
+
+      <sc-if value="{{ expanded }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:center;padding-bottom:14px">
+          <button onClick="{{ collapse }}" aria-label="Collapse" style="width:40px;height:5px;border-radius:3px;background:rgba(245,237,224,.24);border:0;padding:0;cursor:pointer"></button>
+        </div>
+      </sc-if>
+
+      <!-- header: name + verified, reach -->
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px;font-weight:600;color:#F6EFE1;letter-spacing:-.01em">{{ creatorName }}</span>
+        <sc-if value="{{ verified }}" hint-placeholder-val="{{ true }}">
+          <span title="Verified creator" style="display:inline-flex">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-label="Verified"><path d="M8 1.2L10 2.6L12.4 2.5L13 4.8L14.8 6.3L13.9 8.5L14.8 10.7L13 12.2L12.4 14.5L10 14.4L8 15.8L6 14.4L3.6 14.5L3 12.2L1.2 10.7L2.1 8.5L1.2 6.3L3 4.8L3.6 2.5L6 2.6L8 1.2Z" fill="rgba(255,178,77,.18)" stroke="#FFB24D" stroke-width="1"/><path d="M5.5 8L7.2 9.7L10.6 6.2" stroke="#FFB24D" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </sc-if>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px">
+        <sc-for list="{{ reach }}" as="r" hint-placeholder-count="3">
+          <span style="display:inline-flex;align-items:baseline;gap:5px;font-size:12.5px;color:#8C806E">
+            <span style="font-weight:600;color:#C6B9A4;font-variant-numeric:tabular-nums">{{ r.value }}</span>{{ r.label }}
+          </span>
+        </sc-for>
+      </div>
+
+      <!-- packages -->
+      <div style="margin:22px 0 10px;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#8C806E">Package</div>
+      <div role="radiogroup" aria-label="Package" style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ packages }}" as="p" hint-placeholder-count="3">
+          <button onClick="{{ p.onSelect }}" role="radio" aria-checked="{{ p.selected }}" style="position:relative;display:block;width:100%;text-align:left;padding:13px 14px;background:transparent;border:1px solid rgba(245,237,224,.12);border-radius:10px;cursor:pointer;font-family:'Hanken Grotesk',sans-serif" style-hover="border-color:rgba(245,237,224,.28)">
+            <sc-if value="{{ p.selected }}" hint-placeholder-val="{{ false }}">
+              <span aria-hidden="true" style="position:absolute;inset:0;border:1.5px solid rgba(255,178,77,.85);border-radius:10px;background:rgba(255,178,77,.07);pointer-events:none"></span>
+            </sc-if>
+            <span style="position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <span style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:15px;font-weight:600;color:#F2EBDD">{{ p.title }}</span>
+                <sc-if value="{{ p.popular }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#FFCC85;border:1px solid rgba(255,178,77,.4);border-radius:20px;padding:2px 7px">Most booked</span>
+                </sc-if>
+              </span>
+              <span style="font-size:15px;font-weight:700;color:#F6EFE1;font-variant-numeric:tabular-nums">{{ p.priceFmt }}</span>
+            </span>
+            <span style="position:relative;display:block;margin-top:5px;font-size:12px;color:#8C806E">{{ p.turnaround }} · {{ p.revisions }}</span>
+            <span style="position:relative;display:block;margin-top:6px;font-size:12.5px;line-height:1.45;color:#B8AC99">{{ p.sub }}</span>
+          </button>
+        </sc-for>
+      </div>
+
+      <!-- usage rights -->
+      <div style="margin:22px 0 10px;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#8C806E">Usage rights</div>
+      <div role="radiogroup" aria-label="Usage rights" style="display:flex;flex-direction:column;gap:7px">
+        <sc-for list="{{ usageOptions }}" as="u" hint-placeholder-count="4">
+          <button onClick="{{ u.onSelect }}" role="radio" aria-checked="{{ u.selected }}" style="position:relative;display:block;width:100%;text-align:left;padding:11px 13px;background:transparent;border:1px solid rgba(245,237,224,.12);border-radius:9px;cursor:pointer;font-family:'Hanken Grotesk',sans-serif" style-hover="border-color:rgba(245,237,224,.28)">
+            <sc-if value="{{ u.selected }}" hint-placeholder-val="{{ false }}">
+              <span aria-hidden="true" style="position:absolute;inset:0;border:1.5px solid rgba(255,178,77,.85);border-radius:9px;background:rgba(255,178,77,.07);pointer-events:none"></span>
+            </sc-if>
+            <span style="position:relative;display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+              <span style="font-size:13.5px;font-weight:600;color:#F2EBDD">{{ u.name }}</span>
+              <span style="font-size:13px;font-weight:600;color:#FFCC85;font-variant-numeric:tabular-nums;white-space:nowrap">{{ u.deltaFmt }}</span>
+            </span>
+            <span style="position:relative;display:block;margin-top:4px;font-size:12px;line-height:1.4;color:#8C806E">{{ u.note }}</span>
+          </button>
+        </sc-for>
+      </div>
+
+      <!-- total -->
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin:20px 0 4px;padding-top:18px;border-top:1px solid rgba(245,237,224,.1)">
+        <span style="font-size:13px;color:#B8AC99">Total</span>
+        <span style="font-size:26px;font-weight:700;color:#F6EFE1;font-variant-numeric:tabular-nums;letter-spacing:-.01em">{{ totalFmt }}</span>
+      </div>
+      <div style="font-size:11.5px;color:#6E6353;margin-bottom:16px">{{ breakdown }}</div>
+
+      <button onClick="{{ requestBooking }}" style="width:100%;height:50px;background:#FFB24D;color:#17130E;font-size:15px;font-weight:600;border:0;border-radius:7px;cursor:pointer;font-family:'Hanken Grotesk',sans-serif" style-hover="background:#FFC876;box-shadow:0 0 26px rgba(255,178,77,.32)">Request booking</button>
+
+      <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:7px;margin-top:12px;padding:10px 12px;background:rgba(255,178,77,.08);border:1px solid rgba(255,178,77,.3);border-radius:7px;font-size:12.5px;color:#FFE1B0">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 7.2L5.6 10.3L11.5 3.8" stroke="#FFB24D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Request sent. The creator has 48 hours to accept.
+        </div>
+      </sc-if>
+
+      <div style="display:flex;align-items:flex-start;gap:9px;margin-top:16px">
+        <svg width="15" height="17" viewBox="0 0 15 17" fill="none" aria-hidden="true" style="flex:none;margin-top:1px"><path d="M7.5 1L13 3.2V7.6C13 11.2 10.6 13.9 7.5 15.4C4.4 13.9 2 11.2 2 7.6V3.2L7.5 1Z" stroke="#8C806E" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.2 8L6.9 9.7L10 6.4" stroke="#8C806E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="font-size:12px;line-height:1.5;color:#8C806E">Funds are captured at booking and released when you approve delivery.</span>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(245,237,224,.07)">
+        <span style="font-family:'Bodoni Moda',serif;font-size:13px;font-weight:600;color:#8C806E;letter-spacing:.02em">Spectacle</span>
+        <span style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#5C5346">secure booking</span>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1040,&quot;height&quot;:900},&quot;creatorName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Ludo Frantz&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;verified&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;reach&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;{value:string,label:string}[]&quot;},&quot;packages&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;{title:string,price:number,turnaround:string,revisions:string,sub:string,popular?:boolean}[]&quot;}}">
+class Component extends DCLogic {
+  state = { pkg: 1, usage: 0, compact: false, expanded: false, sent: false };
+
+  // LOCKED chrome — identical on every storefront
+  usageDefs = [
+    { name: "Organic post on creator's channel", delta: 0, note: 'They post it to their own audience. No paid-media rights.' },
+    { name: 'Paid usage — 30 days', delta: 6000, note: 'Run it as paid media for 30 days across your channels.' },
+    { name: 'Paid usage — 90 days', delta: 14000, note: 'Run it as paid media for 90 days across your channels.' },
+    { name: 'Whitelisting', delta: 22000, note: "Run ads from the creator's own handle. Includes 90-day paid usage." },
+  ];
+  packageDefaults = [
+    { title: 'Single surface', price: 12000, turnaround: '2 weeks', revisions: '1 revision', sub: 'One object, one location, one film.' },
+    { title: 'The circuit', price: 28000, turnaround: '4 weeks', revisions: '2 revisions', sub: 'Three surfaces across a city, cut into one film.', popular: true },
+    { title: 'Citywide takeover', price: 60000, turnaround: '8 weeks', revisions: '3 revisions', sub: 'A week of nightly projections, documented as a campaign.' },
+  ];
+  reachDefault = [
+    { value: '1.2M', label: 'IG' },
+    { value: '3.8M', label: 'TikTok' },
+    { value: '51.2M', label: '30-day views' },
+  ];
+
+  money(n) { return '$' + Number(n).toLocaleString('en-US'); }
+
+  componentDidMount() {
+    this._mq = window.matchMedia('(max-width: 900px)');
+    this._onMq = () => this.setState({ compact: this._mq.matches, expanded: this._mq.matches ? this.state.expanded : false });
+    this._onMq();
+    this._mq.addEventListener ? this._mq.addEventListener('change', this._onMq) : this._mq.addListener(this._onMq);
+  }
+  componentWillUnmount() {
+    if (this._mq) this._mq.removeEventListener ? this._mq.removeEventListener('change', this._onMq) : this._mq.removeListener(this._onMq);
+    if (this._sentT) clearTimeout(this._sentT);
+  }
+
+  renderVals() {
+    const packages = (this.props.packages && this.props.packages.length) ? this.props.packages : this.packageDefaults;
+    const pkgSel = Math.max(0, Math.min(this.state.pkg, packages.length - 1));
+    const usage = this.usageDefs;
+    const uSel = Math.max(0, Math.min(this.state.usage, usage.length - 1));
+    const total = Number(packages[pkgSel].price) + Number(usage[uSel].delta);
+    const uDelta = Number(usage[uSel].delta);
+    const compact = this.state.compact, expanded = this.state.expanded;
+
+    const panelBase = {
+      background: '#1C1710',
+      border: '1px solid rgba(245,237,224,.09)',
+      borderRadius: '12px',
+      padding: '22px',
+      color: '#F2EBDD',
+      fontFamily: "'Hanken Grotesk', system-ui, sans-serif",
+      boxSizing: 'border-box',
+    };
+
+    return {
+      creatorName: this.props.creatorName || 'Ludo Frantz',
+      verified: this.props.verified !== undefined ? this.props.verified : true,
+      reach: (this.props.reach && this.props.reach.length) ? this.props.reach : this.reachDefault,
+      packages: packages.map((p, i) => ({ ...p, priceFmt: this.money(p.price), selected: i === pkgSel, onSelect: () => this.setState({ pkg: i }) })),
+      usageOptions: usage.map((u, i) => ({ ...u, deltaFmt: u.delta ? '+ ' + this.money(u.delta) : 'Included', selected: i === uSel, onSelect: () => this.setState({ usage: i }) })),
+      totalFmt: this.money(total),
+      breakdown: this.money(packages[pkgSel].price) + ' package' + (uDelta ? ' + ' + this.money(uDelta) + ' usage' : ' · organic post'),
+      selectedPackageTitle: packages[pkgSel].title,
+      sent: this.state.sent,
+      requestBooking: () => {
+        this.setState({ sent: true });
+        if (this._sentT) clearTimeout(this._sentT);
+        this._sentT = setTimeout(() => this.setState({ sent: false }), 4000);
+      },
+      expand: () => this.setState({ expanded: true }),
+      collapse: () => this.setState({ expanded: false }),
+      showBar: compact && !expanded,
+      showPanel: !compact || expanded,
+      showScrim: compact && expanded,
+      expanded,
+      rootStyle: (compact && expanded)
+        ? 'position:fixed;inset:0;z-index:1000'
+        : compact
+          ? 'position:fixed;left:0;right:0;bottom:0;z-index:1000'
+          : 'position:relative;width:100%;max-width:400px;margin:0 auto',
+      panelStyle: Object.assign({}, panelBase, compact ? {
+        position: 'absolute', left: 0, right: 0, bottom: 0,
+        borderRadius: '18px 18px 0 0', maxHeight: '90vh', overflowY: 'auto',
+        boxShadow: '0 -24px 70px rgba(0,0,0,.55)',
+        paddingBottom: 'calc(22px + env(safe-area-inset-bottom))',
+      } : {}),
+      barStyle: 'background:#1C1710;border-top:1px solid rgba(245,237,224,.09);display:flex;align-items:center;gap:12px;padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));box-shadow:0 -18px 50px rgba(0,0,0,.45)',
+    };
+  }
+}
+</script>
+</body>
+</html>

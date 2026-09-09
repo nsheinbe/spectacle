@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bebas+Neue&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Hanken+Grotesk:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Syne:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#16130F;color:#F2EBDD;font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:#FFB24D;text-decoration:none}
+  a:hover{color:#FFE1B0}
+  ::selection{background:rgba(255,178,77,.28);color:#FFF3E2}
+  [data-theme-card]{grid-template-columns:340px minmax(0,1fr)}
+  @media (max-width:760px){[data-theme-card]{grid-template-columns:1fr}[data-swatch]{min-height:200px}}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</helmet>
+<div style="background:#16130F;color:#F2EBDD;font-family:'Hanken Grotesk',system-ui,sans-serif;min-height:100vh">
+  <div style="max-width:1040px;margin:0 auto;padding:clamp(48px,8vh,96px) clamp(20px,4vw,40px) 96px">
+
+    <!-- HEADER -->
+    <header style="max-width:64ch">
+      <div style="font-size:12px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#8C806E">Spectacle · storefront themes</div>
+      <h1 style="margin:18px 0 0;font-family:'Bodoni Moda',serif;font-weight:600;font-size:clamp(40px,6vw,76px);line-height:.98;letter-spacing:-.015em;color:#F6EFE1">The theme contract</h1>
+      <p style="margin:22px 0 0;font-size:17px;line-height:1.6;color:#B8AC99">Every creator storefront is themed to the creator's own medium — the page is the portfolio and an example of the craft. A theme is a preset chosen from this list, derived from the format the creator already declared. Creators never write CSS.</p>
+    </header>
+
+    <!-- THE ONE RULE -->
+    <section style="display:grid;grid-template-columns:1fr;gap:0;margin-top:44px;border:1px solid rgba(255,178,77,.28);border-radius:14px;overflow:hidden">
+      <div style="padding:26px 28px;background:rgba(255,178,77,.05)">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#FFB24D">The one rule</div>
+        <h2 style="margin:12px 0 0;font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(26px,3.4vw,38px);line-height:1.05;color:#F6EFE1">Theme the stage. Never the rail.</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#EDD9BE;letter-spacing:.02em">The stage — changes per theme</div>
+            <p style="margin:8px 0 0;font-size:14px;line-height:1.55;color:#B8AC99">Hero, reel, portfolio, background, ambient motion, display type. The creator's world.</p>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#EDD9BE;letter-spacing:.02em">The rail — byte-identical everywhere</div>
+            <p style="margin:8px 0 0;font-size:14px;line-height:1.55;color:#B8AC99">Packages, prices, usage rights, total, Request booking, verification, the assurance line. Spectacle's chrome.</p>
+          </div>
+        </div>
+      </div>
+      <!-- rail spec strip -->
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px 26px;padding:20px 28px;background:#1C1710;border-top:1px solid rgba(245,237,224,.09)">
+        <span style="font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8C806E">Rail is locked</span>
+        <span style="display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:#B8AC99"><span style="width:14px;height:14px;border-radius:3px;background:#1C1710;border:1px solid rgba(245,237,224,.4)"></span>surface #1C1710</span>
+        <span style="display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:#B8AC99"><span style="width:14px;height:14px;border-radius:3px;background:#FFB24D"></span>CTA #FFB24D</span>
+        <span style="font-size:12.5px;color:#B8AC99">Hanken Grotesk</span>
+        <span style="font-size:12.5px;color:#B8AC99;font-variant-numeric:tabular-nums">tabular $28,000</span>
+        <span style="display:inline-flex;align-items:center;height:30px;padding:0 14px;background:#FFB24D;color:#17130E;font-size:12.5px;font-weight:600;border-radius:5px">Request booking</span>
+        <span style="font-size:12px;color:#6E6353;flex-basis:100%;line-height:1.5">It carries its own background and floats on the theme — a dark rail on daylight concrete is the point. The contrast is the gallery-wall label.</span>
+      </div>
+    </section>
+
+    <!-- PRESETS -->
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin:56px 0 20px">
+      <h2 style="margin:0;font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(24px,3vw,32px);color:#F2EBDD">Five presets</h2>
+      <span style="font-size:13px;color:#8C806E">1 shipped · 4 spec'd</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- 1 PROJECTION (shipped) -->
+      <article data-theme-card="1" style="display:grid;gap:0;border:1px solid rgba(245,237,224,.1);border-radius:14px;overflow:hidden;background:#1A150D">
+        <div data-swatch="1" style="position:relative;overflow:hidden;background:#100D08;min-height:230px">
+          <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(90deg,rgba(255,214,160,.14) 0 1px,transparent 1px 26px),repeating-linear-gradient(0deg,rgba(255,214,160,.12) 0 1px,transparent 1px 26px);-webkit-mask-image:radial-gradient(60% 60% at 38% 46%,#000,transparent 72%);mask-image:radial-gradient(60% 60% at 38% 46%,#000,transparent 72%)"></div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="font-family:'Bodoni Moda',serif;font-weight:700;font-size:40px;letter-spacing:.06em;color:rgba(255,224,175,.08)">MERIDIAN</span></div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;-webkit-mask-image:radial-gradient(40% 42% at 38% 46%,#000,transparent 72%);mask-image:radial-gradient(40% 42% at 38% 46%,#000,transparent 72%)"><span style="font-family:'Bodoni Moda',serif;font-weight:700;font-size:40px;letter-spacing:.06em;color:rgba(255,232,190,.95);text-shadow:0 0 30px rgba(255,178,77,.6)">MERIDIAN</span></div>
+        </div>
+        <div style="padding:26px 28px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <h3 style="margin:0;font-family:'Bodoni Moda',serif;font-weight:600;font-size:26px;color:#F6EFE1">Projection</h3>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#17130E;background:#FFB24D;border-radius:20px;padding:3px 9px">Shipped</span>
+            <span style="font-size:12.5px;color:#8C806E">Projection mapping</span>
+          </div>
+          <p style="margin:14px 0 0;font-size:16px;line-height:1.55;color:#EDE4D5">Surfaces stay unlit until light lands. The creator's work appears only where the beam falls, and nothing glows on its own.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:14px;margin:18px 0 0">
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#16130F;border:1px solid rgba(245,237,224,.3)"></span>#16130F</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#F2EBDD"></span>#F2EBDD</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#FFB24D"></span>#FFB24D</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(245,237,224,.08);font-size:12.5px;color:#8C806E">
+            <span>Display <span style="color:#C6B9A4;font-family:'Bodoni Moda',serif;font-size:14px">Bodoni Moda</span></span>
+            <span>Motion — one beam sweep; reduced-motion parks the beam mid-frame with the work revealed.</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2 FOOH / CGI -->
+      <article data-theme-card="1" style="display:grid;gap:0;border:1px solid rgba(245,237,224,.1);border-radius:14px;overflow:hidden;background:#1A150D">
+        <div data-swatch="1" style="position:relative;overflow:hidden;background:#15181B;min-height:230px">
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.025) 0 2px,transparent 2px 9px)"></div>
+          <div style="position:absolute;left:-6%;top:50%;transform:translateY(-50%);white-space:nowrap"><span style="font-family:'Archivo Black',sans-serif;font-size:58px;letter-spacing:-.02em;color:#E7EAED">HALDEN</span></div>
+          <div style="position:absolute;right:0;top:0;bottom:0;width:34%;background:rgba(0,0,0,.28);border-left:2px dashed rgba(232,86,60,.8)"></div>
+          <div style="position:absolute;right:8px;bottom:10px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(232,86,60,.9)">seam</div>
+        </div>
+        <div style="padding:26px 28px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <h3 style="margin:0;font-family:'Bodoni Moda',serif;font-weight:600;font-size:26px;color:#F6EFE1">FOOH / CGI</h3>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8C806E;border:1px solid rgba(245,237,224,.2);border-radius:20px;padding:3px 9px">Spec</span>
+            <span style="font-size:12.5px;color:#8C806E">Fake out-of-home</span>
+          </div>
+          <p style="margin:14px 0 0;font-size:16px;line-height:1.55;color:#EDE4D5">Content breaks its frame — the poster overflows the card and composites into a photographed street, with the seam left deliberately visible.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:14px;margin:18px 0 0">
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#15181B;border:1px solid rgba(245,237,224,.3)"></span>#15181B</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#E7EAED"></span>#E7EAED</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#E8563C"></span>#E8563C</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(245,237,224,.08);font-size:12.5px;color:#8C806E">
+            <span>Display <span style="color:#C6B9A4;font-family:'Archivo Black',sans-serif;font-size:13px">Archivo Black</span></span>
+            <span>Motion — overflow-and-settle; reduced-motion shows the frame already broken, seam static.</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 3 ANAMORPHIC -->
+      <article data-theme-card="1" style="display:grid;gap:0;border:1px solid rgba(245,237,224,.1);border-radius:14px;overflow:hidden;background:#1A150D">
+        <div data-swatch="1" style="position:relative;overflow:hidden;background:#0A0E1A;min-height:230px">
+          <div style="position:absolute;inset:0;background:linear-gradient(118deg,#0A0E1A 0 49%,#0E1424 49% 51%,#0A0E1A 51%)"></div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;perspective:600px"><span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:42px;letter-spacing:.02em;color:#DDE4F1;transform:rotateY(34deg);transform-origin:right center;text-shadow:0 0 24px rgba(111,168,255,.6)">KESSLER</span></div>
+          <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(111,168,255,.4)"></div>
+        </div>
+        <div style="padding:26px 28px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <h3 style="margin:0;font-family:'Bodoni Moda',serif;font-weight:600;font-size:26px;color:#F6EFE1">Anamorphic</h3>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8C806E;border:1px solid rgba(245,237,224,.2);border-radius:20px;padding:3px 9px">Spec</span>
+            <span style="font-size:12.5px;color:#8C806E">Curved-screen illusion</span>
+          </div>
+          <p style="margin:14px 0 0;font-size:16px;line-height:1.55;color:#EDE4D5">The corner folds. The hero bends across two planes and leans out toward the viewer, the way an LED wraparound screen breaks its edge.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:14px;margin:18px 0 0">
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#0A0E1A;border:1px solid rgba(245,237,224,.3)"></span>#0A0E1A</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#DDE4F1"></span>#DDE4F1</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#6FA8FF"></span>#6FA8FF</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(245,237,224,.08);font-size:12.5px;color:#8C806E">
+            <span>Display <span style="color:#C6B9A4;font-family:'Space Grotesk',sans-serif;font-size:13px">Space Grotesk</span></span>
+            <span>Motion — one fold on load; reduced-motion holds the fold at its most convincing angle.</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 4 DRONE SHOWS -->
+      <article data-theme-card="1" style="display:grid;gap:0;border:1px solid rgba(245,237,224,.1);border-radius:14px;overflow:hidden;background:#1A150D">
+        <div data-swatch="1" style="position:relative;overflow:hidden;background:#06070C;min-height:230px">
+          <div style="position:absolute;inset:0;background-image:radial-gradient(1.5px 1.5px at 16% 26%,rgba(207,224,255,.9),transparent),radial-gradient(1.5px 1.5px at 74% 18%,rgba(207,224,255,.75),transparent),radial-gradient(2px 2px at 38% 66%,rgba(207,224,255,.85),transparent),radial-gradient(1.5px 1.5px at 86% 60%,rgba(207,224,255,.7),transparent),radial-gradient(1.5px 1.5px at 24% 84%,rgba(207,224,255,.8),transparent),radial-gradient(1.5px 1.5px at 62% 82%,rgba(207,224,255,.75),transparent),radial-gradient(2px 2px at 52% 40%,rgba(207,224,255,.9),transparent)"></div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="font-family:'Syne',sans-serif;font-weight:800;font-size:40px;letter-spacing:.02em;color:transparent;-webkit-text-stroke:1px rgba(207,224,255,.9);text-shadow:0 0 30px rgba(207,224,255,.35)">SUNDRY</span></div>
+        </div>
+        <div style="padding:26px 28px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <h3 style="margin:0;font-family:'Bodoni Moda',serif;font-weight:600;font-size:26px;color:#F6EFE1">Drone shows</h3>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8C806E;border:1px solid rgba(245,237,224,.2);border-radius:20px;padding:3px 9px">Spec</span>
+            <span style="font-size:12.5px;color:#8C806E">Sky formations</span>
+          </div>
+          <p style="margin:14px 0 0;font-size:16px;line-height:1.55;color:#EDE4D5">Content resolves out of scattered points of light into formation, the way a drone show assembles a logo in the night sky.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:14px;margin:18px 0 0">
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#06070C;border:1px solid rgba(245,237,224,.3)"></span>#06070C</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#E9ECF3"></span>#E9ECF3</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#CFE0FF"></span>#CFE0FF</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(245,237,224,.08);font-size:12.5px;color:#8C806E">
+            <span>Display <span style="color:#C6B9A4;font-family:'Syne',sans-serif;font-weight:800;font-size:13px">Syne</span></span>
+            <span style="color:#C89A6A">Motion — one assembly on load, capped particle count; static formation on mobile and reduced-motion. This is the theme that melts phones.</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 5 STREET & MURALS (daylight) -->
+      <article data-theme-card="1" style="display:grid;gap:0;border:1px solid rgba(245,237,224,.1);border-radius:14px;overflow:hidden;background:#1A150D">
+        <div data-swatch="1" style="position:relative;overflow:hidden;background:#E8E3D9;min-height:230px">
+          <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.03) 0 1px,transparent 1px 5px)"></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-4deg);background:#EFE9DE;padding:16px 22px;box-shadow:5px 7px 0 rgba(26,23,18,.16);clip-path:polygon(2% 6%,98% 0,100% 92%,4% 100%)"><span style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:.04em;color:#D8322A;line-height:.9">NOVEMBER</span></div>
+        </div>
+        <div style="padding:26px 28px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <h3 style="margin:0;font-family:'Bodoni Moda',serif;font-weight:600;font-size:26px;color:#F6EFE1">Street &amp; murals</h3>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8C806E;border:1px solid rgba(245,237,224,.2);border-radius:20px;padding:3px 9px">Spec</span>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#EDD9BE;border:1px solid rgba(255,178,77,.4);border-radius:20px;padding:3px 9px">Daylight</span>
+          </div>
+          <p style="margin:14px 0 0;font-size:16px;line-height:1.55;color:#EDE4D5">Everything is physical. Tiles sit like pasted posters — slight rotation, torn edges, drop shadows instead of glow. Arriving here after four dark pages should feel like stepping outside.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:14px;margin:18px 0 0">
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#E8E3D9"></span>#E8E3D9</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#1A1712;border:1px solid rgba(245,237,224,.3)"></span>#1A1712</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#B8AC99"><span style="width:15px;height:15px;border-radius:4px;background:#D8322A"></span>#D8322A</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(245,237,224,.08);font-size:12.5px;color:#8C806E">
+            <span>Display <span style="color:#C6B9A4;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.04em">Bebas Neue</span></span>
+            <span>Motion — paper settles on load; reduced-motion is just as good. No glow, so nothing is lost holding still.</span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- CONSTRAINTS FOOTER -->
+    <section style="margin-top:52px;padding-top:28px;border-top:1px solid rgba(245,237,224,.09)">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#8C806E">Holds for every theme</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:18px">
+        <div><div style="font-size:14px;font-weight:700;color:#EDD9BE">AA on its own canvas</div><p style="margin:7px 0 0;font-size:13.5px;line-height:1.55;color:#B8AC99">Stage text clears AA against the theme's own background. The rail is exempt by construction — it carries its own.</p></div>
+        <div><div style="font-size:14px;font-weight:700;color:#EDD9BE">Beautiful when still</div><p style="margin:7px 0 0;font-size:13.5px;line-height:1.55;color:#B8AC99">Each theme has a static reduced-motion variant. If a page only works while moving, the theme has failed.</p></div>
+        <div><div style="font-size:14px;font-weight:700;color:#EDD9BE">One loop, paused off-screen</div><p style="margin:7px 0 0;font-size:13.5px;line-height:1.55;color:#B8AC99">At most one ambient motion loop per page. It stops when scrolled away. Mobile is mandatory.</p></div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1040,&quot;height&quot;:900}}"></script>
+</body>
+</html>
