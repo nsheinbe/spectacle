@@ -11,10 +11,13 @@
     "neon:bootstrap": "tsx scripts/neon-bootstrap.ts",
     "migrate": "tsx scripts/migrate.ts",
     "seed": "tsx scripts/seed.ts",
+    "self-host:init-env": "tsx scripts/self-host-init-env.ts",
+    "self-host:bootstrap": "tsx scripts/self-host-bootstrap.ts",
     "verify:gates": "tsx scripts/verify-gates.ts",
     "verify:gates:canary": "tsx scripts/verify-gates.ts --canary",
     "verify:neon": "tsx scripts/verify-neon.ts",
     "verify:themes": "tsx scripts/verify-themes.ts",
+    "verify:self-host": "tsx scripts/verify-self-host.ts",
     "test": "vitest run"
   },
   "dependencies": {

@@ -2,6 +2,8 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
 
+import { loadLocalEnv } from "./load-local-env";
+
 /**
  * The ONLY way migrations are applied — everywhere. with-throwaway-db.ts, CI,
  * and Neon all run this same journaled chain (drizzle/meta/_journal.json) as
@@ -21,6 +23,7 @@ export async function applyMigrations(ownerUrl: string): Promise<void> {
 }
 
 if (require.main === module) {
+  loadLocalEnv();
   const url = process.env.DATABASE_URL_OWNER;
   if (!url) {
     console.error("DATABASE_URL_OWNER is required (see .env.example)");

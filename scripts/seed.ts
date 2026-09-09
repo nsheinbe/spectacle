@@ -1,16 +1,20 @@
 import { eq, sql } from "drizzle-orm";
 
+import { loadLocalEnv } from "./load-local-env";
+
 /**
  * Dev seed — runs through the REAL app paths wherever possible: users via
  * Better Auth's server API (as auth_user), profiles/storefronts/packages via
  * withUser under RLS (as app_user), and status moves via the SECURITY
  * DEFINER function. If the seed can do it, the app can.
  *
- * Prereqs: roles bootstrapped, database migrated (see README quick start).
+ * Prereqs: roles bootstrapped, database migrated (see README / SELF-HOST.md).
  * Idempotent-ish: personas that already exist are skipped.
  */
 
-const PASSWORD = "spectacle-demo-1!";
+export const SEED_DEMO_PASSWORD = "spectacle-demo-1!";
+export const SEED_BRAND_EMAIL = "aurora@spectacle.test";
+export const SEED_STOREFRONT_SLUG = "lumen-arc";
 
 type CreatorSpec = {
   email: string;
@@ -161,7 +165,7 @@ async function main(): Promise<void> {
       .where(eq(schema.user.email, email));
     if (existing) return existing.id;
     const res = await auth.api.signUpEmail({
-      body: { email, password: PASSWORD, name },
+      body: { email, password: SEED_DEMO_PASSWORD, name },
     });
     if (!res.user) throw new Error(`signup failed for ${email}`);
     return res.user.id;
@@ -344,16 +348,20 @@ async function main(): Promise<void> {
     console.log("bookings already seeded — skipped");
   }
 
-  console.log(`\nAll demo accounts use password: ${PASSWORD}`);
+  console.log(`\nAll demo accounts use password: ${SEED_DEMO_PASSWORD}`);
   console.log("Creators: lumen@ volt@ gilded@ swarm@spectacle.test");
-  console.log("Brands:   aurora@ koda@spectacle.test");
+  console.log(`Brands:   ${SEED_BRAND_EMAIL} koda@spectacle.test`);
+  console.log(`Storefront: /c/${SEED_STOREFRONT_SLUG}`);
 
   const { _closeAppPool } = await import("../src/db/client.internal");
   const { _closeAuthPool } = await import("../src/db/auth-db");
   await Promise.allSettled([_closeAppPool(), _closeAuthPool()]);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (require.main === module) {
+  loadLocalEnv();
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

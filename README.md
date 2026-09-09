@@ -8,7 +8,12 @@ database — not the application — enforces who may do what.
 **Phase 1** (this repo): themed creator storefronts, booking to `awaiting_payment`
 (brand accepts a proposal, then waits), and the shared workspace. **No Stripe, no
 capture, no payouts, no discovery** (`/browse` is behind `FEATURE_BROWSE=false` with
-no UI). Never the word "escrow": the column is `payment_state`, the status is `funded`.
+no UI). The column is `payment_state`; the status is `funded`.
+
+Open source: run it on one machine without Vercel or Neon —
+[SELF-HOST.md](SELF-HOST.md). The fee is in the open —
+[FEE-POLICY.md](FEE-POLICY.md) (`platform_config.fee_bps` is authoritative;
+today **1000** = 10% of the booking).
 
 ## Quick start
 
@@ -39,6 +44,10 @@ pnpm dev
 
 Environment variables are documented in [.env.example](.env.example) — the three
 database URLs map one-to-one onto the three Postgres roles below.
+
+To serve with `next start` on one machine (app + Postgres 17 + three roles +
+migrate + seed), follow [SELF-HOST.md](SELF-HOST.md). `pnpm verify:self-host`
+is the recorded path CI runs.
 
 ## Security model — the database is the trust boundary
 
@@ -244,7 +253,7 @@ the database, so the runtime surface is a connection string, a driver, and SQL.
   on the Better Auth user record; `profiles.role` is authoritative.
 - **Platform fee lives in the DB** (`platform_config`, owner-only) because the SD
   function must re-derive money without trusting the app; `PLATFORM_FEE_BPS` env
-  only feeds UI estimates.
+  only feeds UI estimates. Public statement: [FEE-POLICY.md](FEE-POLICY.md).
 - **`bookings.updated_at`** exists for the SD-function stamp (not in the original
   column spec — logged) and is bumped by a `BEFORE UPDATE` trigger so the
   app_user title/brief edit (whose column allowlist deliberately excludes
@@ -297,12 +306,14 @@ participant gates run before any adapter call):
 
 ## Phase status
 
-- **Phase 1 (this repo)**: storefronts, booking → `awaiting_payment`, workspace,
-  gates. Done when: typecheck + build clean; verify-gates green incl. every canary
-  row RED-then-green; verify-themes green; seed runs; status tests pass; all
-  routes phone-reachable; both enabled edges exercisable from `/bookings/[id]`.
-- **Phase 2**: Stripe (webhooks → `funded`/`paid_out` as system edges),
-  deliverable uploads in the workspace, discovery behind `FEATURE_BROWSE`.
-  `webhook_events` and the payment columns already exist so Phase 2 touches no
-  existing structure.
-- **Phase 3**: briefs marketplace (`briefs`/`brief_responses` tables ready).
+Numbered remaining work lives in [BUILD-PLAN.md](BUILD-PLAN.md).
+[PROGRESS.md](PROGRESS.md) is the living checklist.
+
+- Marketplace foundation (storefronts, booking → `awaiting_payment`, workspace,
+  gates): **done**.
+- BUILD-PLAN Phase 1 (Design import): **done**.
+- BUILD-PLAN Phase 2 (open rails — self-host + fee policy): **this repo**.
+  [SELF-HOST.md](SELF-HOST.md), [FEE-POLICY.md](FEE-POLICY.md).
+- BUILD-PLAN Phase 3 (deliverable uploads + discovery): next.
+- Stripe money-in is BUILD-PLAN Phase 4 and is hard-gated. Do not start it
+  from this file. Briefs stay parked.

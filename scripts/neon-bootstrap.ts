@@ -57,7 +57,7 @@ export function withCredentials(url: string, user: string, password: string): st
   return u.toString();
 }
 
-function generatePassword(): string {
+export function generatePassword(): string {
   // base64url: no ':', '@', '/' or '?', so it survives URL embedding unescaped
   return randomBytes(24).toString("base64url");
 }
