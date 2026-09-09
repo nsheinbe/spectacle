@@ -133,23 +133,31 @@ async function main(): Promise<void> {
     childEnv.BETTER_AUTH_URL = origin;
     childEnv.PORT = String(port);
 
-    console.log(`next start -H 127.0.0.1 -p ${port}`);
-    child = spawn(
-      "pnpm",
-      ["start", "--", "-H", "127.0.0.1", "-p", String(port)],
-      {
-        cwd: ROOT,
-        env: childEnv,
-        stdio: ["ignore", "pipe", "pipe"],
-        detached: true,
-      },
-    );
+    // `pnpm start` is the documented command. Next reads PORT from the env
+    // (passing `-H` after `pnpm start --` is treated as a project directory).
+    console.log(`pnpm start (PORT=${port})`);
+    child = spawn("pnpm", ["start"], {
+      cwd: ROOT,
+      env: childEnv,
+      stdio: ["ignore", "pipe", "pipe"],
+      detached: true,
+    });
     let stderr = "";
+    let stdout = "";
     child.stderr?.on("data", (buf: Buffer) => {
       stderr += buf.toString();
     });
+    child.stdout?.on("data", (buf: Buffer) => {
+      stdout += buf.toString();
+    });
 
-    await waitForHealth(origin, child, 60_000);
+    try {
+      await waitForHealth(origin, child, 60_000);
+    } catch (err) {
+      console.error("next start stdout:\n", stdout.slice(-1500));
+      console.error("next start stderr:\n", stderr.slice(-1500));
+      throw err;
+    }
     console.log("GET /api/health → { ok: true }");
 
     const storefront = await fetch(`${origin}/c/${SEED_STOREFRONT_SLUG}`, { cache: "no-store" });

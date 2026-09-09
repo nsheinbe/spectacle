@@ -30,7 +30,7 @@ describe("Phase 2 — open rails, self-host, fee policy", () => {
     expect(policy).toMatch(/10%/);
     expect(policy).toMatch(/database is authoritative/i);
     expect(policy).toMatch(/PLATFORM_FEE_BPS/);
-    expect(policy).toMatch(/app_user cannot write `platform_config`/);
+    expect(policy).toMatch(/app_user[\s`]+cannot write[\s`]+platform_config/);
     expect(policy).toMatch(/purchaser \(brand\)/);
     expect(policy).toMatch(/REVOKE ALL/);
     expect(policy).not.toMatch(/competitor \w+ takes/i);
