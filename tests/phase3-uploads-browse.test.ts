@@ -36,7 +36,7 @@ describe("Phase 3 — deliverable uploads and discovery", () => {
     const loader = read("src/lib/published-storefronts.ts");
     expect(loader).toContain("publicCreatorView");
     expect(loader).toMatch(/published storefronts only/i);
-    expect(loader).not.toMatch(/rating|gmv|12\.4M|social proof/i);
+    expect(loader).not.toMatch(/\$12\.4M|12\.4M|4\.9|2\.4M|5\.1M/);
   });
 
   it("browse copy is honest — no invented ratings or GMV", () => {

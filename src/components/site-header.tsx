@@ -6,7 +6,12 @@ import { LAUNCH_COPY } from "@/lib/launch-copy";
 
 /** Platform chrome — never themed. */
 export async function SiteHeader() {
-  const session = await getServerSession();
+  let session: Awaited<ReturnType<typeof getServerSession>> = null;
+  try {
+    session = await getServerSession();
+  } catch {
+    session = null;
+  }
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-canvas/90 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">

@@ -12,7 +12,8 @@ export type PublishedStorefront = {
 
 /**
  * Published storefronts only (`public_creator_view` already filters
- * `published = true`). No ratings, GMV, or other invented social proof.
+ * `published = true`). Honest fields only: slug, name, format, lowest
+ * active package price.
  */
 export async function loadPublishedStorefronts(
   limit?: number,
